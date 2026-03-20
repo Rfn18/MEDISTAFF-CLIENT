@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  /* main palete */
+  --color-blue-dark: #03045e;
+  --color-blue-primary: #0077b6;
+  --color-blue-accent: #00b4d8;
+  --color-blue-soft: #90e0ef;
+  --color-blue-light: #caf0f8;
+
+  /* bg & tesxt */
+  --color-background: #f9fafb;
+  --color-foreground: #03045e;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #03045e;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #03045e;
+
+  /* primary */
+  --color-primary: #0077b6;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #90e0ef;
+  --color-secondary-foreground: #03045e;
+
+  --color-accent: #00b4d8;
+  --color-accent-foreground: #ffffff;
+
+  --color-muted: #caf0f8;
+  --color-muted-foreground: #0077b6;
+
+  /* status color */
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  --color-success: #22c55e;
+  --color-success-foreground: #ffffff;
+
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #ffffff;
+
+  /* border & input */
+  --color-border: #dae7e5;
+  --color-input: #dae7e5;
+  --color-ring: #0077b6;
+
+  --radius: 0.75rem;
+}
+
+@utility auth-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--color-blue-primary) 0%,
+    var(--color-blue-accent) 100%
+  );
+}
