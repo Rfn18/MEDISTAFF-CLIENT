@@ -3,6 +3,7 @@ import { Login } from "./pages/auth/LoginPage";
 import { Register } from "./pages/auth/RegisterPage";
 import Dashboard from "./pages/admin/DashboardPage";
 import "./App.css";
+import ManagementPage from "./pages/admin/ManagementPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
 
         {/* Admin */}
         <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/management" element={<ManagementPage />} />
       </Routes>
     </BrowserRouter>
   );

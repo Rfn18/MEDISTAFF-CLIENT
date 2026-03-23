@@ -1,15 +1,12 @@
 import {
-  BriefcaseBusiness,
-  Building,
   CalendarClock,
   DollarSign,
   HeartPulse,
   Home,
-  Notebook,
   Radio,
   Users,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const DashboardSidebar = () => {
@@ -21,19 +18,9 @@ const DashboardSidebar = () => {
       name: "Dashboard",
     },
     {
-      href: "/admin/karyawan",
+      href: "/admin/management",
       icon: <Users />,
-      name: "Karyawan",
-    },
-    {
-      href: "/admin/departemen",
-      icon: <Building />,
-      name: "Departemen",
-    },
-    {
-      href: "/admin/jabatan",
-      icon: <BriefcaseBusiness />,
-      name: "Jabatan",
+      name: "Management",
     },
     {
       href: "/admin/jadwal-shift",
