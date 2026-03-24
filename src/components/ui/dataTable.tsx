@@ -13,7 +13,6 @@ type DataTableProps<T> = {
 };
 
 export default function DataTable<T>({ columns, data }: DataTableProps<T>) {
-  console.log(data, columns);
   return (
     <table className="w-full text-left mt-4">
       <thead>

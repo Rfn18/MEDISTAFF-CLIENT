@@ -9,13 +9,11 @@ export type Employee = {
   address: string;
   phone_number: string;
   email: string;
-  status: string;
   photo?: string;
   hire_date: string;
   employee_status: string;
   position_id: number;
   department_id: number;
-  role_id: number;
   department: {
     id: number;
     department_name: string;
@@ -24,4 +22,16 @@ export type Employee = {
     id: number;
     position_name: string;
   };
+};
+
+export type Position = {
+  id: number;
+  position_name: string;
+  description: string;
+};
+
+export type Department = {
+  id: number;
+  department_name: string;
+  description: string;
 };
