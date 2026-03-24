@@ -1,5 +1,5 @@
 export type Employee = {
-  id?: number;
+  id: number;
   nip: string;
   nik: string;
   full_name: string;
@@ -24,6 +24,26 @@ export type Employee = {
   };
 };
 
+export type User = {
+  id?: number;
+  name: string;
+  email: string;
+  password: string;
+  is_active: number;
+  device_id: string;
+  role_id: number;
+  employee_id: number;
+  last_login_at: string;
+  employee: {
+    id: number;
+    full_name: string;
+  };
+  role: {
+    id: number;
+    role_name: string;
+  };
+};
+
 export type Position = {
   id: number;
   position_name: string;
@@ -33,5 +53,11 @@ export type Position = {
 export type Department = {
   id: number;
   department_name: string;
+  description: string;
+};
+
+export type Role = {
+  id: number;
+  role_name: string;
   description: string;
 };

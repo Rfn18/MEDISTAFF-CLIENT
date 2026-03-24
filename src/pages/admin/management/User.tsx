@@ -1,40 +1,40 @@
 import { Plus, Search } from "lucide-react";
 import { Card, CardHeader } from "../../../components/ui/card";
 import { useEffect, useState } from "react";
-import { EmployeeTable } from "../../../components/dashboard/ManagementDashboard";
+import { UserTable } from "../../../components/dashboard/ManagementDashboard";
 import SideModal from "../../../components/ui/sideModal";
-import EmployeeForm from "../../../components/form/EmployeeForm";
-import type { Employee as EmployeeType } from "../../../types/userType";
+import type { User } from "../../../types/userType";
 import axios from "axios";
+import UserForm from "../../../components/form/UserForm";
 
-export default function Employee() {
+export default function UserPage() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const [open, setOpen] = useState(false);
-  const [employeeData, setEmployeeData] = useState<EmployeeType[]>([]);
-  const [employeeForm, setEmployeeForm] = useState<EmployeeType | null>(null);
+  const [userData, setUserData] = useState<User[]>([]);
+  const [userForm, setUserForm] = useState<User | null>(null);
 
-  const fetchEmployee = async () => {
+  const fetchUser = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/employees`);
+      const response = await axios.get(`${baseUrl}/api/users`);
       const data = response.data.data.datas.data;
-      setEmployeeData(data);
+      setUserData(data);
     } catch (error) {
       console.error("fething data error", error);
     }
   };
 
   useEffect(() => {
-    fetchEmployee();
+    fetchUser();
   }, []);
 
-  const handleAddEmployee = async (data: EmployeeType) => {
-    setEmployeeForm(data);
+  const handleAddUser = async (data: User) => {
+    setUserForm(data);
 
     try {
-      await axios.post(`${baseUrl}/api/employees`, data);
-      setEmployeeForm(null);
-      fetchEmployee();
+      await axios.post(`${baseUrl}/api/users`, data);
+      setUserForm(null);
+      fetchUser();
     } catch (error) {
       console.error("fething data error", error);
     } finally {
@@ -42,37 +42,37 @@ export default function Employee() {
     }
   };
 
-  const handleInactivateEmployee = async (row: EmployeeType) => {
-    const newStatus = row.employee_status === "active" ? "inactive" : "active";
+  const handleInactivateUser = async (row: User) => {
+    const newStatus = row.is_active === 1 ? 0 : 1;
     try {
       const response = await axios.post(
-        `${baseUrl}/api/employees/${row.id}/status`,
+        `${baseUrl}/api/users/${row.id}/status`,
         {
-          employee_status: newStatus,
+          is_active: newStatus,
           _method: "PUT",
         },
       );
       console.log(response);
-      fetchEmployee();
+      fetchUser();
     } catch (error) {
       console.error("fething data error", error);
     }
   };
 
-  const openEditEmployee = (row: EmployeeType) => {
-    setEmployeeForm(row);
+  const openEditUser = (row: User) => {
+    setUserForm(row);
     setOpen(true);
   };
 
-  const handleUpdateEmployee = async (data: EmployeeType) => {
+  const handleUpdateUser = async (data: User) => {
     try {
-      await axios.post(`${baseUrl}/api/employees/${employeeForm?.id}`, {
+      await axios.post(`${baseUrl}/api/users/${userForm?.id}`, {
         ...data,
         _method: "PUT",
       });
 
-      fetchEmployee();
-      setEmployeeForm(null);
+      fetchUser();
+      setUserForm(null);
       setOpen(false);
     } catch (error) {
       console.error("update error", error);
@@ -87,10 +87,10 @@ export default function Employee() {
           <div className="w-full flex justify-between items-center">
             <div>
               <select className="w-50 px-4 py-2 border border-border rounded-md text-sm">
-                <option value="">deparment</option>
+                <option value="">last login</option>
               </select>
               <select className="w-50 px-4 py-2 border border-border rounded-md text-sm ml-4">
-                <option value="">posisi</option>
+                <option value="">role</option>
               </select>
             </div>
             <div className="flex justify-end items-center">
@@ -98,7 +98,7 @@ export default function Employee() {
                 <Search size={18} />
                 <input
                   type="text"
-                  placeholder="Cari karyawan..."
+                  placeholder="Cari user..."
                   className="w-full h-full focus:outline-none ml-2 text-sm"
                 />
               </div>
@@ -107,35 +107,35 @@ export default function Employee() {
                 className="flex text-sm auth-gradient opacity-60 hover:opacity-100 transition text-white items-center gap-2 px-4 py-2 rounded-md ml-4 cursor-pointer"
               >
                 <Plus size={18} />
-                Tambah Karyawan
+                Tambah User
               </button>
             </div>
           </div>
         </CardHeader>
         <div>
-          <EmployeeTable
-            data={employeeData}
-            onEdit={(row) => openEditEmployee(row)}
-            onActivate={(row) => handleInactivateEmployee(row)}
+          <UserTable
+            data={userData}
+            onEdit={(row) => openEditUser(row)}
+            onDelete={(row) => handleInactivateUser(row)}
           />
         </div>
       </Card>
 
       <SideModal
-        title={employeeForm ? "Edit Employee" : "Add Employee"}
+        title={userForm ? "Edit User" : "Add User"}
         open={open}
         onClose={() => {
           setOpen(false);
-          setEmployeeForm(null);
+          setUserForm(null);
         }}
       >
-        <EmployeeForm
+        <UserForm
           onCancel={() => {
             setOpen(false);
-            setEmployeeForm(null);
+            setUserForm(null);
           }}
-          onSubmit={employeeForm ? handleUpdateEmployee : handleAddEmployee}
-          defaultValue={employeeForm ? [employeeForm] : []}
+          onSubmit={userForm ? handleUpdateUser : handleAddUser}
+          defaultValue={userForm ? [userForm] : []}
         />
       </SideModal>
     </>

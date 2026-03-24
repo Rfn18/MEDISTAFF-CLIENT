@@ -1,6 +1,7 @@
 import {
   BriefcaseBusiness,
   Building,
+  KeyRound,
   User,
   Users,
 } from "lucide-react";
@@ -8,6 +9,9 @@ import Layout from "../../components/layouts/DashboardLayout";
 import { useState } from "react";
 import Employee from "./management/Employee";
 import Department from "./management/Department";
+import Position from "./management/Position";
+import Role from "./management/Role";
+import UserPage from "./management/User";
 
 const ManagementPage = () => {
   const [activeTab, setActiveTab] = useState("karyawan");
@@ -33,10 +37,16 @@ const ManagementPage = () => {
             <Building size={16} /> Department
           </button>
           <button
-            className={`flex items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${activeTab === "jabatan" ? "bg-background text-blue-dark" : "text-blue-dark/60"}`}
-            onClick={() => setActiveTab("jabatan")}
+            className={`flex items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${activeTab === "posisi" ? "bg-background text-blue-dark" : "text-blue-dark/60"}`}
+            onClick={() => setActiveTab("posisi")}
           >
-            <BriefcaseBusiness size={16} /> Jabatan
+            <BriefcaseBusiness size={16} /> Posisi
+          </button>
+          <button
+            className={`flex items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${activeTab === "role" ? "bg-background text-blue-dark" : "text-blue-dark/60"}`}
+            onClick={() => setActiveTab("role")}
+          >
+            <KeyRound size={16} /> Role
           </button>
           <button
             className={`flex items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${activeTab === "user" ? "bg-background text-blue-dark" : "text-blue-dark/60"}`}
@@ -49,6 +59,9 @@ const ManagementPage = () => {
       <div className="mt-4">
         {activeTab === "karyawan" && <Employee />}
         {activeTab === "department" && <Department />}
+        {activeTab === "posisi" && <Position />}
+        {activeTab === "role" && <Role />}
+        {activeTab === "user" && <UserPage />}
       </div>
     </Layout>
   );

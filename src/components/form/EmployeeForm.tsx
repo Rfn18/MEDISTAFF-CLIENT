@@ -52,6 +52,7 @@ export default function EmployeeForm({
     const gender = formData.get("gender") === "Laki-laki" ? "male" : "female";
 
     const data: Employee = {
+      id: defaultValue?.[0]?.id || 0,
       nip: formData.get("nip") as string,
       nik: formData.get("nik") as string,
       full_name: formData.get("full_name") as string,
@@ -157,7 +158,7 @@ export default function EmployeeForm({
       />
 
       <SelectField
-        label="Jabatan"
+        label="Posisi"
         name="position_id"
         options={position.map((item) => ({
           id: item.id,
