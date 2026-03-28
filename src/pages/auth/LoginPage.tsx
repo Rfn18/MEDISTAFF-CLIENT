@@ -1,21 +1,26 @@
-import { Eye, EyeClosed, IdCard, LoaderCircle, Lock, Mail } from "lucide-react";
+import { Eye, EyeClosed, LoaderCircle, Lock, Mail } from "lucide-react";
 import { AuthCard } from "../../components/auth/AuthCardt";
 import { Link, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
+import { getDeviceId } from "../../utils/getDeviceId";
 
 export const Login = () => {
   const [showPw, setShowPw] = useState<boolean>(false);
   const [data, setData] = useState({
     email: "",
     password: "",
+    device_id: "",
   });
   const [alert, setAlert] = useState<boolean>(false);
   const [errorAlert, setErrorAlert] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const bareer = localStorage.getItem("bareer_token");
-  const user = localStorage.getItem("user");
+  const auth = localStorage.getItem("auth");
+
+  useEffect(() => {
+    setData({ ...data, device_id: getDeviceId() });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -40,17 +45,9 @@ export const Login = () => {
       }
 
       const result = await response.json();
+      const authData = result.data;
 
-      if (!bareer || !user) {
-        localStorage.setItem("bareer_token", result.access_token);
-        localStorage.setItem("user", result.user.role);
-      } else {
-        localStorage.removeItem("bareer_token");
-        localStorage.removeItem("user");
-        localStorage.setItem("bareer_token", result.access_token);
-        localStorage.setItem("user", result.user.role);
-      }
-      navigate("/dashboard");
+      localStorage.setItem("auth", JSON.stringify(authData));
     } catch (error) {
       console.error(error);
       setErrorAlert(!errorAlert);
@@ -58,6 +55,14 @@ export const Login = () => {
         setErrorAlert(false);
       }, 5000);
     } finally {
+      const authData = JSON.parse(localStorage.getItem("auth")!).datas;
+      if (authData.user.role_id === 1) {
+        navigate("/dashboard");
+      } else if (authData.user.role_id === 2) {
+        navigate("/admin/dashboard");
+      } else if (authData.user.role_id === 3) {
+        navigate("/staff/dashboard");
+      }
       setLoading(false);
     }
   };
@@ -113,15 +118,15 @@ export const Login = () => {
       </div>
       <div className="flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col gap-2 my-4">
-          <label htmlFor="nip" className="text-sm font-semibold">
-            NIP
+          <label htmlFor="email" className="text-sm font-semibold">
+            Email
           </label>
           <div className="flex items-center bg-background w-full h-12 mb-2 border border-[#ddd] rounded-xl">
-            <IdCard size="20" className="m-3 opacity-70" />
+            <Mail size="20" className="m-3 opacity-70" />
             <input
-              type="number"
-              name="nip"
-              placeholder="Enter Your NIP"
+              type="email"
+              name="email"
+              placeholder="Enter Your Email"
               className="w-full h-full text-sm outline-none"
               onChange={handleChange}
             />

@@ -6,7 +6,7 @@ type InputFieldProps = {
   type?: string;
   placeholder?: string;
   value?: string;
-  defaultValue?: string;
+  defaultValue?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 

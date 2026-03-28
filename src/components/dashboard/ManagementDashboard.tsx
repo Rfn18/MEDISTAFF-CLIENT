@@ -240,8 +240,6 @@ export function UserTable({
     return splitDate[1];
   };
   
-  const now = new Date();
-  console.log(now)
   const columns: Column<User>[] = [
     {
       header: "ID",

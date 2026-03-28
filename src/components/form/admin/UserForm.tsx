@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import type { Employee, Role, User } from "../../types/userType";
-import InputField from "../ui/inputField";
+import type { Employee, Role, User } from "../../../types/userType";
+import InputField from "../../ui/inputField";
 import axios from "axios";
-import SelectField from "../ui/selectField";
+import SelectField from "../../ui/selectField";
 
 type UserFormProps = {
   defaultValue?: User[];

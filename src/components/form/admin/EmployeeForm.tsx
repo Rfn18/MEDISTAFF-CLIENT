@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import type { Department, Employee, Position } from "../../types/userType";
-import InputField from "../ui/inputField";
+import type { Department, Employee, Position } from "../../../types/userType";
+import InputField from "../../ui/inputField";
 import axios from "axios";
-import SelectField from "../ui/selectField";
+import SelectField from "../../ui/selectField";
 
 type EmployeeFormProps = {
   defaultValue?: Employee[];
@@ -78,8 +78,6 @@ export default function EmployeeForm({
 
     onSubmit(data);
   };
-
-  console.log(defaultValue?.[0]?.employee_status);
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">

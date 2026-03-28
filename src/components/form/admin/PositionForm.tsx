@@ -1,25 +1,25 @@
-import type { Role } from "../../types/userType";
-import InputField from "../ui/inputField";
+import type { Position } from "../../../types/userType";
+import InputField from "../../ui/inputField";
 
-type RoleFormProps = {
-  defaultValue?: Role[];
+type PositionTableProps = {
+  defaultValue?: Position[];
   onCancel: () => void;
-  onSubmit: (data: Role) => void;
+  onSubmit: (data: Position) => void;
 };
 
-export default function RoleForm({
+export default function PositionForm({
   defaultValue,
   onCancel,
   onSubmit,
-}: RoleFormProps) {
+}: PositionTableProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
 
-    const data: Role = {
+    const data: Position = {
       id: defaultValue?.[0]?.id || 0,
-      role_name: formData.get("role_name") as string,
+      position_name: formData.get("position_name") as string,
       description: formData.get("description") as string,
     };
 
@@ -30,14 +30,14 @@ export default function RoleForm({
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <InputField
         label="Name"
-        name="role_name"
-        placeholder="exp: Staff"
-        defaultValue={defaultValue?.[0]?.role_name}
+        name="position_name"
+        placeholder="exp: Perawat"
+        defaultValue={defaultValue?.[0]?.position_name}
       />
       <InputField
         label="Description"
         name="description"
-        placeholder="exp: Mengelola data kehadiran dan data absensi pribadi karyawan."
+        placeholder="exp: Jabatan Perawat"
         defaultValue={defaultValue?.[0]?.description}
       />
 

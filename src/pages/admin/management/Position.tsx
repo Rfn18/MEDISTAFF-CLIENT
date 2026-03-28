@@ -2,10 +2,10 @@ import { Plus, Search } from "lucide-react";
 import { Card, CardHeader } from "../../../components/ui/card";
 import { useEffect, useState } from "react";
 import { PositionTable } from "../../../components/dashboard/ManagementDashboard";
-import SideModal from "../../../components/ui/sideModal";
+import SideModal from "../../../components/ui/Modal";
 import type { Position } from "../../../types/userType";
 import axios from "axios";
-import PositionForm from "../../../components/form/PositionForm";
+import PositionForm from "../../../components/form/admin/PositionForm";
 
 export default function Position() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;

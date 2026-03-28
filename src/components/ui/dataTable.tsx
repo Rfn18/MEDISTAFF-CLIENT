@@ -1,4 +1,5 @@
 import React from "react";
+import { Loading } from "./load";
 
 type Column<T> = {
   header: string;
@@ -29,7 +30,7 @@ export default function DataTable<T>({ columns, data }: DataTableProps<T>) {
         {data.length === 0 ? (
           <tr>
             <td colSpan={columns.length} className="text-center p-6">
-              Tidak ada data
+              <Loading message="Memuat Data..." />
             </td>
           </tr>
         ) : (

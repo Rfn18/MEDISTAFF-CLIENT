@@ -2,8 +2,8 @@ import { Plus, Search } from "lucide-react";
 import { Card, CardHeader } from "../../../components/ui/card";
 import { useEffect, useState } from "react";
 import { EmployeeTable } from "../../../components/dashboard/ManagementDashboard";
-import SideModal from "../../../components/ui/sideModal";
-import EmployeeForm from "../../../components/form/EmployeeForm";
+import SideModal from "../../../components/ui/Modal";
+import EmployeeForm from "../../../components/form/admin/EmployeeForm";
 import type { Employee as EmployeeType } from "../../../types/userType";
 import axios from "axios";
 

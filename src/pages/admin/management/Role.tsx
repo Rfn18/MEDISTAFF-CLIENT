@@ -2,10 +2,10 @@ import { Plus, Search } from "lucide-react";
 import { Card, CardHeader } from "../../../components/ui/card";
 import { useEffect, useState } from "react";
 import { RoleTable } from "../../../components/dashboard/ManagementDashboard";
-import SideModal from "../../../components/ui/sideModal";
+import SideModal from "../../../components/ui/Modal";
 import type { Role } from "../../../types/userType";
 import axios from "axios";
-import RoleForm from "../../../components/form/RoleForm";
+import RoleForm from "../../../components/form/admin/RoleForm";
 
 export default function Role() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;

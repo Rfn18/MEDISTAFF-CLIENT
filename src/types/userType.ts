@@ -1,3 +1,5 @@
+type RoleName = "HR admin" | "Staff";
+
 export type Employee = {
   id: number;
   nip: string;
@@ -40,8 +42,17 @@ export type User = {
   };
   role: {
     id: number;
-    role_name: string;
+    role_name: RoleName;
   };
+};
+
+export type AuthData = {
+  datas: {
+    token: string;
+    user: User;
+  };
+  message: string;
+  status: string;
 };
 
 export type Position = {
@@ -59,5 +70,43 @@ export type Department = {
 export type Role = {
   id: number;
   role_name: string;
+  description: string;
+};
+
+export type LeaveRequest = {
+  id: number;
+  employee_id: number;
+  leave_type_id: number;
+  start_date: string;
+  end_date: string;
+  reason: string;
+  status: string;
+  leave_type: {
+    id: number;
+    leave_type_name: string;
+  };
+  employee?: {
+    id: number;
+    full_name: string;
+    photo?: string;
+    email?: string;
+    position: {
+      id: number;
+      position_name: string;
+    };
+    department: {
+      id: number;
+      department_name: string;
+    };
+  };
+  approved_by: number;
+  approved_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type LeaveType = {
+  id: number;
+  leave_type_name: string;
   description: string;
 };

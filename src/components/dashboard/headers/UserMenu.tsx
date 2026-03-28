@@ -8,8 +8,12 @@ import {
   SettingsIcon,
   UserCircleIcon,
 } from "lucide-react";
+import { useAuth } from "../../../context/AuthContext";
+import api from "../../../services/api";
 
 export default function UserMenu() {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  const { logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -27,9 +31,14 @@ export default function UserMenu() {
     setDropdownOpen(false);
   };
 
-  const signOut = () => {
-    console.log("Signing out...");
-    closeDropdown();
+  const signOut = async () => {
+    try {
+      await api.post(`${baseUrl}/api/logout`);
+      await logout();
+      closeDropdown();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -98,7 +107,7 @@ export default function UserMenu() {
           </ul>
 
           <Link
-            to="/signin"
+            to="/login"
             onClick={signOut}
             className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-blue-dark rounded-lg group text-sm hover:bg-background"
           >

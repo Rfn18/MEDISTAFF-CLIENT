@@ -2,8 +2,8 @@ import { Plus, Search } from "lucide-react";
 import { Card, CardHeader } from "../../../components/ui/card";
 import { useEffect, useState } from "react";
 import { DepartmentTable } from "../../../components/dashboard/ManagementDashboard";
-import SideModal from "../../../components/ui/sideModal";
-import DepartmentForm from "../../../components/form/DepartmentForm";
+import SideModal from "../../../components/ui/Modal";
+import DepartmentForm from "../../../components/form/admin/DepartmentForm";
 import type { Department as DepartmentType } from "../../../types/userType";
 import axios from "axios";
 
@@ -12,7 +12,9 @@ export default function Department() {
 
   const [open, setOpen] = useState(false);
   const [departmentData, setDepartmentData] = useState<DepartmentType[]>([]);
-  const [departmentForm, setDepartmentForm] = useState<DepartmentType | null>(null);
+  const [departmentForm, setDepartmentForm] = useState<DepartmentType | null>(
+    null,
+  );
 
   const fetchDepartment = async () => {
     try {
@@ -118,7 +120,9 @@ export default function Department() {
             setOpen(false);
             setDepartmentForm(null);
           }}
-          onSubmit={departmentForm ? handleUpdateDepartment : handleAddDepartment}
+          onSubmit={
+            departmentForm ? handleUpdateDepartment : handleAddDepartment
+          }
           defaultValue={departmentForm ? [departmentForm] : []}
         />
       </SideModal>

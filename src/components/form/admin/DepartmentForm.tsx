@@ -1,5 +1,5 @@
-import type { Department } from "../../types/userType";
-import InputField from "../ui/inputField";
+import type { Department } from "../../../types/userType";
+import InputField from "../../ui/inputField";
 
 type DepartmentFormProps = {
   defaultValue?: Department[];

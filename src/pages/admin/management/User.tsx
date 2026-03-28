@@ -2,10 +2,11 @@ import { Plus, Search } from "lucide-react";
 import { Card, CardHeader } from "../../../components/ui/card";
 import { useEffect, useState } from "react";
 import { UserTable } from "../../../components/dashboard/ManagementDashboard";
-import SideModal from "../../../components/ui/sideModal";
+import SideModal from "../../../components/ui/Modal";
 import type { User } from "../../../types/userType";
 import axios from "axios";
-import UserForm from "../../../components/form/UserForm";
+import UserForm from "../../../components/form/admin/UserForm";
+import { Loading } from "../../../components/ui/load";
 
 export default function UserPage() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -13,14 +14,18 @@ export default function UserPage() {
   const [open, setOpen] = useState(false);
   const [userData, setUserData] = useState<User[]>([]);
   const [userForm, setUserForm] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchUser = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${baseUrl}/api/users`);
       const data = response.data.data.datas.data;
       setUserData(data);
     } catch (error) {
       console.error("fething data error", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,12 +37,14 @@ export default function UserPage() {
     setUserForm(data);
 
     try {
+      setLoading(true);
       await axios.post(`${baseUrl}/api/users`, data);
       setUserForm(null);
       fetchUser();
     } catch (error) {
       console.error("fething data error", error);
     } finally {
+      setLoading(false);
       setOpen(false);
     }
   };
@@ -45,6 +52,7 @@ export default function UserPage() {
   const handleInactivateUser = async (row: User) => {
     const newStatus = row.is_active === 1 ? 0 : 1;
     try {
+      setLoading(true);
       const response = await axios.post(
         `${baseUrl}/api/users/${row.id}/status`,
         {
@@ -56,6 +64,8 @@ export default function UserPage() {
       fetchUser();
     } catch (error) {
       console.error("fething data error", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,6 +76,7 @@ export default function UserPage() {
 
   const handleUpdateUser = async (data: User) => {
     try {
+      setLoading(true);
       await axios.post(`${baseUrl}/api/users/${userForm?.id}`, {
         ...data,
         _method: "PUT",
@@ -76,6 +87,8 @@ export default function UserPage() {
       setOpen(false);
     } catch (error) {
       console.error("update error", error);
+    } finally {
+      setLoading(false);
     }
   };
 
