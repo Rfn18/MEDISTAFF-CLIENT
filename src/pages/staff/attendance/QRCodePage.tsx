@@ -16,13 +16,16 @@ const QRCodePage = () => {
   const [qrToken, setQrToken] = useState<string>("");
   const [countdownTimer, setCountdownTimer] = useState<number>(30);
   const [loading, setLoading] = useState<boolean>(false);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null,
+  );
 
   const fetchQrCode = async () => {
     try {
       setLoading(true);
       const response = await api.get(`${baseUrl}/api/dinamic-qr`);
       const data = response.data;
-      setQrToken(data);
+      setQrToken(data.qr_payload);
     } catch (error) {
       console.error("fetching qr code error", error);
     } finally {
@@ -32,7 +35,6 @@ const QRCodePage = () => {
 
   useEffect(() => {
     fetchQrCode();
-
     const timer = setInterval(() => {
       fetchQrCode();
     }, 30000);
@@ -45,6 +47,47 @@ const QRCodePage = () => {
       clearInterval(countdownTimer);
     };
   }, []);
+
+  const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Browser Anda tidak mendukung GPS"));
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          // Berikan pesan yang jelas jika GPS dimatikan
+          let msg = "Gagal mengambil lokasi.";
+          if (error.code === 1)
+            msg = "Mohon izinkan akses lokasi di pengaturan browser Anda.";
+          reject(new Error(msg));
+        },
+        {
+          enableHighAccuracy: true, // WAJIB: Agar menggunakan GPS, bukan hanya koneksi internet
+          timeout: 10000, // Menunggu maksimal 10 detik
+          maximumAge: 0, // Jangan gunakan lokasi lama yang tersimpan di cache
+        },
+      );
+    });
+  };
+
+  useEffect(() => {
+    getCurrentLocation()
+      .then((loc) => {
+        setLocation(loc);
+        console.log("Lokasi berhasil didapatkan:", loc);
+      })
+      .catch((err) => {
+        console.error("Gagal mendapatkan lokasi:", err.message);
+      });
+  }, []);
+  console.log(location);
 
   return (
     <Layout>
@@ -67,7 +110,7 @@ const QRCodePage = () => {
             {loading ? (
               <Loading message="Memuat QR Code..." />
             ) : (
-              <div className="bg-white p-5 rounded-xl inline-block">
+              <div className="bg-white p-5 rounded-xl inline-block animate-[floatUp_0.3s_ease-out]">
                 <QRCodeCanvas value={qrToken} size={300} level={"H"} />
               </div>
             )}

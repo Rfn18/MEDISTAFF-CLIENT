@@ -14,6 +14,7 @@
     "@tailwindplus/elements": "^1.0.22",
     "axios": "^1.13.6",
     "clsx": "^2.1.1",
+    "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.577.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.4",

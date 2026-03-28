@@ -15,6 +15,7 @@ import NotFound from "./pages/Unauthorized";
 import Unauthorized from "./pages/Unauthorized";
 import AttendancePage from "./pages/admin/attendance/AttendancePage";
 import QRCodePage from "./pages/staff/attendance/QRCodePage";
+import ScanPage from "./pages/admin/attendance/ScanPage";
 
 function App() {
   return (
@@ -35,7 +36,9 @@ function App() {
             path="/admin/persetujuan-cuti"
             element={<LeaveAgreementPage />}
           />
+          {/* Attendance */}
           <Route path="/admin/absensi" element={<AttendancePage />} />
+          <Route path="/admin/scan-absensi" element={<ScanPage />} />
         </Route>
 
         <Route element={<StaffMiddleware />}>
