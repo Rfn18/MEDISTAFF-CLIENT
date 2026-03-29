@@ -12,13 +12,17 @@ export const transformSchedule = (
   days: number,
 ): TransformedEmployee[] => {
   const result: Record<number, TransformedEmployee> = {};
-  console.log(data);
+  if (!data || !employees) {
+    return [];
+  }
 
   data.forEach((item, index) => {
     const employeeId = item.employee_id;
     const filteredName = employees.find(
       (employee) => employee.id === employeeId,
     )?.full_name;
+
+    console.log(employeeId);
 
     if (!result[employeeId]) {
       result[employeeId] = {
@@ -29,8 +33,6 @@ export const transformSchedule = (
         shiftIds: Array(days).fill(null),
       };
     }
-
-    console.log(result);
 
     const dayIndex = index % days;
 
@@ -51,7 +53,6 @@ export const transformSchedule = (
     }
   });
 
-  console.log(result);
   return Object.values(result);
 };
 

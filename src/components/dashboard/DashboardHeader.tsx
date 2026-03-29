@@ -1,14 +1,19 @@
 import { Bell, Moon } from "lucide-react";
 import { SearchBar } from "./headers/SearchBar";
 import UserMenu from "./headers/UserMenu";
+import { useLayout } from "../../context/LayoutContext";
 
-const DashboardHeader = () => {
+const DashboardHeader = ({}: {}) => {
+  const { setIsSidebarOpen, isSidebarOpen } = useLayout();
   return (
     <>
-      <header className="sticky top-0 flex w-full bg-white border-border z-99999  lg:border-b">
+      <header className="sticky top-0 flex w-full bg-white border-border z-1  lg:border-b">
         <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
           <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-border sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
-            <button className="flex items-center justify-center w-10 h-10 text-blue-dark border-border rounded-lg z-99999 lg:h-11 lg:w-11 lg:border">
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="flex items-center justify-center w-10 h-10 text-blue-dark border-border rounded-lg z-99999 lg:h-11 lg:w-11 lg:border cursor-pointer"
+            >
               <svg
                 v-else
                 width="16"
@@ -25,7 +30,6 @@ const DashboardHeader = () => {
                 />
               </svg>
             </button>
-            {/* <HeaderLogo /> */}
             <SearchBar />
           </div>
           <div className=" mr-4">

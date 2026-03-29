@@ -4,6 +4,7 @@ import type { Attendance } from "../../types/attendanceType";
 import type { Department, Employee } from "../../types/userType";
 import DataTable from "../ui/dataTable";
 import formatTime from "../../utils/formatTime";
+import { Link } from "react-router-dom";
 
 type Column<T> = {
   header: string;
@@ -13,13 +14,7 @@ type Column<T> = {
   onActivate?: (row: T) => void;
 };
 
-export function AttendanceTable({
-  data,
-  onOpen,
-}: {
-  data: Attendance[];
-  onOpen: (row: Attendance) => void;
-}) {
+export function AttendanceTable({ data }: { data: Attendance[] }) {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [employee, setEmployee] = useState<Employee[]>([]);
   const [department, setDepartment] = useState<Department[]>([]);
@@ -140,12 +135,12 @@ export function AttendanceTable({
       header: "Profile",
       render: (row: Attendance) => (
         <div className="flex gap-2">
-          <button
-            onClick={() => onOpen?.(row)}
+          <Link
+            to={`/admin/karyawan/${row.employee_id}`}
             className="auth-gradient text-white w-30 px-4 py-2 rounded-md text-sm hover:-translate-y-1 hover:cursor-pointer transition"
           >
             Lihat Detail
-          </button>
+          </Link>
         </div>
       ),
     },

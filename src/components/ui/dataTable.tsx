@@ -15,18 +15,21 @@ type DataTableProps<T> = {
 
 export default function DataTable<T>({ columns, data }: DataTableProps<T>) {
   return (
-    <table className="w-full text-left mt-4">
+    <table className="w-full text-left text-sm text-blue-dark border-collapse min-w-[700px] mt-4">
       <thead>
-        <tr className="border-b border-border text-sm text-blue-dark font-semibold">
+        <tr>
           {columns.map((col, i) => (
-            <th key={i} className="p-4">
+            <th
+              key={i}
+              className="font-semibold uppercase tracking-wider text-[11px] px-6 py-4"
+            >
               {col.header}
             </th>
           ))}
         </tr>
       </thead>
 
-      <tbody className="text-sm text-blue-dark">
+      <tbody className="divide-y divide-border">
         {data.length === 0 ? (
           <tr>
             <td colSpan={columns.length} className="text-center p-6">
@@ -35,9 +38,12 @@ export default function DataTable<T>({ columns, data }: DataTableProps<T>) {
           </tr>
         ) : (
           data.map((row, rowIndex) => (
-            <tr key={rowIndex} className="border-b border-[#119184]/20">
+            <tr
+              key={rowIndex}
+              className="hover:bg-blue-50/30 transition-colors group text-blue-dark"
+            >
               {columns.map((col, colIndex) => (
-                <td key={colIndex} className="p-4">
+                <td key={colIndex} className="px-6 py-4">
                   {col.render
                     ? col.render(row)
                     : col.accessor

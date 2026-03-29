@@ -16,6 +16,13 @@ import Unauthorized from "./pages/Unauthorized";
 import AttendancePage from "./pages/admin/attendance/AttendancePage";
 import QRCodePage from "./pages/staff/attendance/QRCodePage";
 import ScanPage from "./pages/admin/attendance/ScanPage";
+import StaffSchedulePage from "./pages/staff/schedule/StaffSchedulePage";
+import ProfilePage from "./pages/shared/ProfilePage";
+import EmployeeProfileAdmin from "./pages/admin/management/EmployeeProfileAdmin";
+import FluxAdminDashboard from "./pages/admin/attendance/FluxAdminDashboard";
+import FluxEmployeeDashboard from "./pages/staff/attendance/FluxEmployeeDashboard";
+import PayrollPage from "./pages/admin/payroll/PayrollPage";
+import PayrollComponent from "./pages/admin/payroll/PayrollComponent";
 
 function App() {
   return (
@@ -28,7 +35,12 @@ function App() {
         <Route element={<AdminMiddleware />}>
           {/* Admin */}
           <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/admin/profil" element={<ProfilePage />} />
           <Route path="/admin/management" element={<ManagementPage />} />
+          <Route
+            path="/admin/karyawan/:id"
+            element={<EmployeeProfileAdmin />}
+          />
           {/* Schedule */}
           <Route path="/admin/jadwal-shift" element={<ScheduleListPage />} />
           <Route path="/admin/request-shift" element={<RequestSchedule />} />
@@ -39,13 +51,27 @@ function App() {
           {/* Attendance */}
           <Route path="/admin/absensi" element={<AttendancePage />} />
           <Route path="/admin/scan-absensi" element={<ScanPage />} />
+          <Route
+            path="/admin/flux-attendance"
+            element={<FluxAdminDashboard />}
+          />
+
+          {/* Payroll */}
+          <Route path="/admin/gaji" element={<PayrollPage />} />
+          <Route path="/admin/komponen-gaji" element={<PayrollComponent />} />
         </Route>
 
         <Route element={<StaffMiddleware />}>
           {/* Staff */}
           <Route path="/staff/dashboard" element={<DashboardPage />} />
+          <Route path="/staff/profil" element={<ProfilePage />} />
+          <Route path="/staff/jadwal-shift" element={<StaffSchedulePage />} />
           <Route path="/staff/pengajuan-cuti" element={<LeaveRequestPage />} />
           <Route path="/staff/absensi" element={<QRCodePage />} />
+          <Route
+            path="/staff/flux-attendance"
+            element={<FluxEmployeeDashboard />}
+          />
         </Route>
         <Route path="*" element={<NotFound />} />
         <Route path="/unauthorized" element={<Unauthorized />} />

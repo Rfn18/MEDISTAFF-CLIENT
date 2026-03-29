@@ -13,14 +13,18 @@ import api from "../../../services/api";
 
 export default function UserMenu() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
+  const userRole = user?.role_id;
+  const profileUrl =
+    userRole === 2 || userRole === 1 ? "/admin/profil" : "/staff/profil";
+
   const menuItems = [
-    { href: "/profile", icon: UserCircleIcon, text: "Edit profil" },
-    { href: "/profile", icon: SettingsIcon, text: "Settings" },
-    { href: "/profile", icon: InfoIcon, text: "Support" },
+    { href: profileUrl, icon: UserCircleIcon, text: "profil" },
+    { href: "#", icon: SettingsIcon, text: "Settings" },
+    { href: "#", icon: InfoIcon, text: "Support" },
   ];
 
   const toggleDropdown = () => {
@@ -33,8 +37,9 @@ export default function UserMenu() {
 
   const signOut = async () => {
     try {
-      await api.post(`${baseUrl}/api/logout`);
+      await api.post(`/logout`);
       await logout();
+      navigate("/login");
       closeDropdown();
     } catch (error) {
       console.error("Error signing out:", error);
@@ -57,46 +62,66 @@ export default function UserMenu() {
     };
   }, []);
 
+  const employeeName = user?.employee?.full_name || user?.name || "User";
+  const userPhoto = user?.employee?.photo
+    ? `${baseUrl}/storage/employee/${user.employee.photo}`
+    : "https://ui-avatars.com/api/?name=" +
+      encodeURIComponent(employeeName) +
+      "&background=cce3de&color=03045e";
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         className="flex items-center text-blue-dark text-sm cursor-pointer"
         onClick={toggleDropdown}
       >
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <img src="/img/FasterinoFormal.png" alt="User" />
+        <span className="mr-3 overflow-hidden rounded-full h-11 w-11 border border-border">
+          <img
+            src={userPhoto}
+            alt="User"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                "https://ui-avatars.com/api/?name=" +
+                encodeURIComponent(employeeName) +
+                "&background=cce3de&color=03045e";
+            }}
+          />
         </span>
 
-        <span className="block mr-1 font-medium text-blue-dark">Fasterino</span>
+        <span className="block mr-1 font-semibold text-blue-dark max-w-[150px] truncate">
+          {employeeName}
+        </span>
 
         <ChevronDownIcon
           size={18}
-          className={`transition-transform ${dropdownOpen ? "rotate-180" : ""} text-blue-dark`}
+          className={`transition-transform ${dropdownOpen ? "rotate-180" : ""} text-blue-dark/60 ml-1`}
         />
       </button>
 
       {dropdownOpen && (
-        <div className="absolute right-0 mt-4.25 flex w-65 flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-md">
-          <div>
-            <span className="block font-medium text-blue-dark text-sm">
-              Fasterino Rafael
+        <div className="absolute right-0 mt-4.5 flex w-[260px] flex-col rounded-2xl border border-border bg-white p-3 shadow-lg z-50">
+          <div className="px-2 pt-1 pb-3 overflow-hidden">
+            <span className="block font-bold text-blue-dark text-base truncate">
+              {employeeName}
             </span>
-            <span className="mt-0.5 block text-blue-dark/60 text-sm">
-              rinofaster89@gmail.com
+            <span className="block mt-0.5 text-muted-foreground text-sm truncate">
+              {user?.email || "No Email"}
             </span>
           </div>
 
-          <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-border text-sm ">
+          <ul className="flex flex-col gap-1 pt-3 pb-3 border-t border-b border-border/60 text-sm">
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
-                <li key={item.href}>
+                <li key={item.text}>
                   <Link
                     to={item.href}
-                    className="flex items-center gap-3 px-3 py-2 font-medium text-blue-dark rounded-lg group text-sm hover:bg-background "
+                    onClick={closeDropdown}
+                    className="flex items-center gap-3 px-3 py-2.5 font-semibold text-blue-dark rounded-xl group text-sm hover:bg-slate-50 transition-colors"
                   >
                     <Icon
-                      className="text-blue-dark/60 group-hover:text-blue-dark"
+                      className="text-muted-foreground group-hover:text-blue-primary transition-colors"
                       size={18}
                     />
                     {item.text}
@@ -106,17 +131,16 @@ export default function UserMenu() {
             })}
           </ul>
 
-          <Link
-            to="/login"
+          <div
             onClick={signOut}
-            className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-blue-dark rounded-lg group text-sm hover:bg-background"
+            className="flex items-center gap-3 px-3 py-2.5 mt-2 font-semibold text-red-600 rounded-xl group text-sm hover:bg-red-50/50 hover:cursor-pointer transition-colors"
           >
             <LogOutIcon
-              className="text-blue-dark/60 group-hover:text-blue-dark"
+              className="text-red-400 group-hover:text-red-500 transition-colors"
               size={18}
             />
-            Sign out
-          </Link>
+            Keluar
+          </div>
         </div>
       )}
     </div>

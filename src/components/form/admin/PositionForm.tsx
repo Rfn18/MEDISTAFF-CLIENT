@@ -21,6 +21,7 @@ export default function PositionForm({
       id: defaultValue?.[0]?.id || 0,
       position_name: formData.get("position_name") as string,
       description: formData.get("description") as string,
+      base_salary: Number(formData.get("base_salary")),
     };
 
     onSubmit(data);
@@ -39,6 +40,12 @@ export default function PositionForm({
         name="description"
         placeholder="exp: Jabatan Perawat"
         defaultValue={defaultValue?.[0]?.description}
+      />
+      <InputField
+        label="Base Salary"
+        name="base_salary"
+        placeholder="exp: 1000000"
+        defaultValue={defaultValue?.[0]?.base_salary}
       />
 
       <div className="flex gap-2 mt-2">

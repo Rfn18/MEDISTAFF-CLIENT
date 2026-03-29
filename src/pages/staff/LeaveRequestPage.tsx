@@ -22,7 +22,7 @@ const LeaveRequestPage = () => {
 
   const fetchLeaveData = async () => {
     try {
-      const response = await api.get(`${baseUrl}/api/leave-request/by`);
+      const response = await api.get(`/leave-request/by`);
       const data = response?.data.data.datas.data;
       setLeaveData(data);
     } catch (error) {
@@ -188,7 +188,7 @@ const LeaveRequestPage = () => {
         </Card>
       </div>
       <SideModal
-        title={leaveForm ? "Edit Employee" : "Add Employee"}
+        title={leaveForm ? "Edit Permintaan Cuti" : "Tambah Permintaan Cuti"}
         open={open}
         onClose={() => {
           setOpen(false);

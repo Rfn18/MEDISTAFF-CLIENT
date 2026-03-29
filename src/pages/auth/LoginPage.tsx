@@ -29,8 +29,7 @@ export const Login = () => {
       const response = await api.post("/login", data);
 
       const result = response.data;
-      const authData = result.data;
-      console.log(result)
+      const authData = result.data; 
 
       localStorage.setItem("auth", JSON.stringify(authData));
     } catch (error) {
@@ -52,7 +51,7 @@ export const Login = () => {
     }
   };
 
-  console.log(data)
+  console.log(data);
 
   useEffect(() => {
     const indicatorAlert = localStorage.getItem("alert");

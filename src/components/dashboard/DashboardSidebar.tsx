@@ -11,14 +11,14 @@ import {
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useLayout } from "../../context/LayoutContext";
 
 const DashboardSidebar = () => {
+  const { isSidebarOpen } = useLayout();
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { user } = useAuth();
   const userRole = user?.role_id;
-  console.log(userRole);
-
   const menuItems =
     userRole === 2
       ? [
@@ -57,7 +57,10 @@ const DashboardSidebar = () => {
           {
             name: "Gaji Karyawan",
             icon: <DollarSign size={20} />,
-            href: "/admin/gaji",
+            subItems: [
+              { name: "List Gaji", href: "/admin/gaji" },
+              { name: "Komponen Gaji", href: "/admin/komponen-gaji" },
+            ],
           },
         ]
       : [
@@ -88,74 +91,94 @@ const DashboardSidebar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const toggleMenu = (name: string) => {
-    setOpenMenu(openMenu === name ? null : name);
-  };
-
   return (
-    <div className="flex flex-col h-full p-6 bg-accent-foreground">
-      <div className="flex items-center gap-2">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl auth-gradient shadow-lg">
+    <div
+      className={`flex flex-col h-full bg-accent-foreground transition-all duration-300 ease-in-out overflow-hidden ${
+        isSidebarOpen ? "w-70 p-6" : "w-23 p-6"
+      }`}
+    >
+      <div className="flex items-center gap-3 min-w-max">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl auth-gradient shadow-lg">
           <HeartPulse
             className="h-6 w-6 text-primary-foreground"
             strokeWidth={2.5}
           />
         </div>
-        <h1 className="text-lg font-bold text-foreground">MediStaff</h1>
+        <h1
+          className={`text-lg font-bold text-foreground transition-all duration-300 origin-left ${
+            isSidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-0 w-0"
+          }`}
+        >
+          MediStaff
+        </h1>
       </div>
-      <div className="mt-10">
+
+      {/* Menu Section */}
+      <div className="mt-10 overflow-y-auto no-scrollbar overflow-hidden">
         <ul className="flex flex-col gap-2">
           {menuItems.map((item, index) => (
-            <li key={index}>
+            <li key={index} className="min-w-max">
               {item.subItems ? (
-                <>
+                <div className="flex flex-col">
                   <button
-                    onClick={() => toggleMenu(item.name)}
-                    className="flex items-center justify-between w-full p-2 rounded-lg text-sm font-medium text-blue-dark/60 hover:text-blue-dark transition hover:bg-background hover:cursor-pointer"
+                    onClick={() =>
+                      isSidebarOpen &&
+                      setOpenMenu(openMenu === item.name ? null : item.name)
+                    }
+                    className={`flex items-center justify-between w-full p-3 rounded-lg text-sm font-medium transition-colors ${
+                      isActive(item.href || "")
+                        ? "bg-primary/20 text-blue-dark"
+                        : "text-blue-dark/60 hover:bg-background w-full"
+                    }`}
                   >
-                    <div className="flex items-center gap-2">
-                      {item.icon}
-                      {item.name}
+                    <div className="flex items-center gap-3">
+                      <span className="shrink-0">{item.icon}</span>
+                      <span
+                        className={`transition-opacity duration-300 ${isSidebarOpen ? "opacity-100" : "opacity-0 w-0"}`}
+                      >
+                        {item.name}
+                      </span>
                     </div>
-
-                    <ChevronDown
-                      size={16}
-                      className={`transition ${
-                        openMenu === item.name ? "rotate-180" : ""
-                      }`}
-                    />
+                    {isSidebarOpen && (
+                      <ChevronDown
+                        size={16}
+                        className={`transition-transform duration-300 ${openMenu === item.name ? "rotate-180" : ""}`}
+                      />
+                    )}
                   </button>
 
-                  {openMenu === item.name && (
-                    <ul className="ml-7 mt-2 flex flex-col gap-1">
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${openMenu === item.name && isSidebarOpen ? "max-h-40 mt-2" : "max-h-0"} `}
+                  >
+                    <ul className="ml-9 flex flex-col gap-1 border-l-2 border-primary/10 pl-2">
                       {item.subItems.map((sub, i) => (
                         <li key={i}>
                           <Link
                             to={sub.href}
-                            className={`block p-2 rounded-md text-sm transition ${
-                              isActive(sub.href)
-                                ? "opacity-100 bg-primary/20"
-                                : "text-blue-dark/60 hover:text-blue-dark hover:bg-background"
-                            }`}
+                            className={`block p-2 rounded-md text-sm transition-colors ${isActive(sub.href) ? "text-primary font-semibold" : "text-blue-dark/60 hover:text-blue-dark"}`}
                           >
                             {sub.name}
                           </Link>
                         </li>
                       ))}
                     </ul>
-                  )}
-                </>
+                  </div>
+                </div>
               ) : (
                 <Link
                   to={item.href}
-                  className={`flex items-center gap-2 p-2 rounded-lg text-sm font-medium transition ${
+                  className={`flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all ${
                     isActive(item.href)
-                      ? "opacity-100 bg-primary/20"
-                      : "text-blue-dark/60 hover:text-blue-dark hover:bg-background"
+                      ? "bg-primary/20 text-blue-dark"
+                      : "text-blue-dark/60 hover:bg-background"
                   }`}
                 >
-                  {item.icon}
-                  {item.name}
+                  <span className="shrink-0">{item.icon}</span>
+                  <span
+                    className={`transition-opacity duration-300 ${isSidebarOpen ? "opacity-100" : "opacity-0 w-0 "}`}
+                  >
+                    {item.name}
+                  </span>
                 </Link>
               )}
             </li>

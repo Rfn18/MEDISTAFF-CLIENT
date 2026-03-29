@@ -35,10 +35,22 @@ export type User = {
   device_id: string;
   role_id: number;
   employee_id: number;
+  department_id?: number;
   last_login_at: string;
   employee: {
     id: number;
     full_name: string;
+    photo?: string;
+    email?: string;
+    department_id?: number;
+    department?: {
+      id: number;
+      department_name: string;
+    };
+    position?: {
+      id: number;
+      position_name: string;
+    };
   };
   role: {
     id: number;
@@ -59,6 +71,7 @@ export type Position = {
   id: number;
   position_name: string;
   description: string;
+  base_salary: number;
 };
 
 export type Department = {
@@ -109,4 +122,14 @@ export type LeaveType = {
   id: number;
   leave_type_name: string;
   description: string;
+};
+
+export type Payroll = {
+  id: number;
+  employee_id: number;
+  month: number;
+  year: number;
+  base_salary?: number;
+  status?: string;
+  created_at?: string;
 };

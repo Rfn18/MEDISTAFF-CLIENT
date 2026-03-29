@@ -1,4 +1,11 @@
-import { Pencil, Trash } from "lucide-react";
+import {
+  Circle,
+  CircleCheck,
+  CircleX,
+  Loader,
+  Pencil,
+  Trash,
+} from "lucide-react";
 import type { Employee, LeaveRequest } from "../../types/userType";
 import DataTable from "../ui/dataTable";
 import { useEffect, useState } from "react";
@@ -62,14 +69,21 @@ export function LeaveRequestTable({
       header: "Status",
       render: (row: LeaveRequest) => (
         <span
-          className={`px-2 py-1 rounded-md text-xs font-semibold ${
+          className={`flex gap-2 items-center p-1 justify-center rounded-lg text-xs font-semibold ${
             row.status === "approved"
-              ? "bg-success/10 text-success"
+              ? "bg-success/10 text-success border border-success/20"
               : row.status === "rejected"
-                ? "bg-destructive/10 text-destructive"
-                : "bg-warning/10 text-warning"
+                ? "bg-destructive/10 text-destructive border border-destructive /20"
+                : "bg-warning/10 text-warning border border-warning/20"
           }`}
         >
+          {row.status === "approved" ? (
+            <CircleCheck size={16} />
+          ) : row.status === "rejected" ? (
+            <CircleX size={16} />
+          ) : (
+            <Loader size={16} className="animate-spin" />
+          )}
           {row.status}
         </span>
       ),

@@ -7,6 +7,8 @@ import type {
   Role,
   User,
 } from "../../types/userType";
+import { Link } from "react-router-dom";
+import { toRupiah } from "../../utils/toRupiah";
 type Column<T> = {
   header: string;
   accessor?: keyof T;
@@ -45,7 +47,9 @@ export function EmployeeTable({
             />
           )}
           <div>
-            <h1 className="font-semibold">{row.full_name}</h1>
+            <h1 className="font-semibold hover:underline hover:text-blue-primary transition-colors cursor-pointer">
+              <Link to={`/admin/karyawan/${row.id}`}>{row.full_name}</Link>
+            </h1>
             <p className="text-sm">{row.email}</p>
           </div>
         </div>
@@ -158,6 +162,10 @@ export function PositionTable({
       render: (row: Position) => row.description,
     },
     {
+      header: "Base Salary",
+      render: (row: Position) => toRupiah(row.base_salary),
+    },
+    {
       header: "Aksi",
       render: (row: Position) => (
         <>
@@ -246,7 +254,7 @@ export function UserTable({
     const splitDate = data.split(" ");
     return splitDate[1];
   };
-  
+
   const columns: Column<User>[] = [
     {
       header: "ID",

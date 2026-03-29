@@ -7,9 +7,7 @@ import {
   ArrowDownUp,
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../components/ui/card";
-import {
-  LeaveAgreementTable,
-} from "../../components/leaveRequest/UserRequest";
+import { LeaveAgreementTable } from "../../components/leaveRequest/UserRequest";
 import { useEffect, useState } from "react";
 import type { LeaveRequest } from "../../types/userType";
 import api from "../../services/api";
@@ -84,7 +82,7 @@ const LeaveAgreementPage = () => {
     const startDate = new Date(start);
     const endDate = new Date(end);
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     return diffDays;
   };
 
@@ -95,7 +93,7 @@ const LeaveAgreementPage = () => {
       await api.put(`${baseUrl}/api/leave-requests/${leaveForm.id}/${action}`);
       setOpen(false);
       setLeaveForm(null);
-      fetchLeaveData(); 
+      fetchLeaveData();
     } catch (error) {
       console.error(`Error ${action} leave request:`, error);
       alert(`Gagal memproses pengajuan cuti.`);
@@ -138,13 +136,18 @@ const LeaveAgreementPage = () => {
         <Card className="gap-4 min-w-60 border border-border shadow-sm py-6 px-5 h-auto">
           <CardHeader className="flex-col md:flex-row justify-between items-start md:items-center border-none m-0 p-0 w-full gap-4">
             <p className="text-sm text-muted-foreground w-full">
-              <span className="font-bold text-blue-dark text-base">{leaveData.length}</span> Pengajuan Ditemukan
+              <span className="font-bold text-blue-dark text-base">
+                {leaveData.length}
+              </span>{" "}
+              Pengajuan Ditemukan
             </p>
             <div className="w-full flex justify-start md:justify-end items-center">
               <div className="flex gap-3 w-full md:w-auto">
                 <div className="flex w-fit items-center hidden md:flex">
                   <ArrowDownUp className="w-4 h-4 text-muted-foreground mr-2" />
-                  <p className="text-sm text-muted-foreground whitespace-nowrap">Urutkan</p>
+                  <p className="text-sm text-muted-foreground whitespace-nowrap">
+                    Filter
+                  </p>
                 </div>
                 <input
                   type="date"
@@ -170,8 +173,12 @@ const LeaveAgreementPage = () => {
                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
                   <Box className="w-8 h-8 text-blue-primary/60" />
                 </div>
-                <p className="text-lg font-bold text-blue-dark">Belum ada permintaan cuti</p>
-                <p className="text-sm text-muted-foreground mt-1">Saat ini tidak ada data pengajuan cuti yang perlu ditinjau.</p>
+                <p className="text-lg font-bold text-blue-dark">
+                  Belum ada permintaan cuti
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Saat ini tidak ada data pengajuan cuti yang perlu ditinjau.
+                </p>
               </div>
             )}
           </div>
@@ -195,12 +202,21 @@ const LeaveAgreementPage = () => {
                 src={
                   leaveForm.employee?.photo
                     ? `${baseUrl}/storage/employee/${leaveForm.employee.photo}`
-                    : "https://ui-avatars.com/api/?name=" + encodeURIComponent(leaveForm.employee?.full_name || "User") + "&background=cce3de&color=03045e"
+                    : "https://ui-avatars.com/api/?name=" +
+                      encodeURIComponent(
+                        leaveForm.employee?.full_name || "User",
+                      ) +
+                      "&background=cce3de&color=03045e"
                 }
                 alt={leaveForm.employee?.full_name}
                 className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover object-center ring-4 ring-blue-50 shadow-sm"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(leaveForm.employee?.full_name || "User") + "&background=cce3de&color=03045e";
+                  (e.target as HTMLImageElement).src =
+                    "https://ui-avatars.com/api/?name=" +
+                    encodeURIComponent(
+                      leaveForm.employee?.full_name || "User",
+                    ) +
+                    "&background=cce3de&color=03045e";
                 }}
               />
               <div className="flex-1">
@@ -212,17 +228,28 @@ const LeaveAgreementPage = () => {
                   {leaveForm.employee?.email || "Tidak ada email"}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <Badge variant="blue">{leaveForm.employee?.department?.department_name || "Departemen Tidak Diketahui"}</Badge>
-                  <Badge variant="outline">{leaveForm.employee?.position?.position_name || "Posisi Tidak Diketahui"}</Badge>
+                  <Badge variant="blue">
+                    {leaveForm.employee?.department?.department_name ||
+                      "Departemen Tidak Diketahui"}
+                  </Badge>
+                  <Badge variant="outline">
+                    {leaveForm.employee?.position?.position_name ||
+                      "Posisi Tidak Diketahui"}
+                  </Badge>
                 </div>
               </div>
-              
+
               {/* Status Badge */}
               <div className="sm:self-start mt-2 sm:mt-0">
-                <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border
-                  ${leaveForm.status?.toLowerCase() === 'approved' ? 'bg-success/10 text-success border-success/20' : 
-                    leaveForm.status?.toLowerCase() === 'rejected' ? 'bg-destructive/10 text-destructive border-destructive/20' : 
-                    'bg-warning/10 text-warning border-warning/20'}`}
+                <div
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border
+                  ${
+                    leaveForm.status?.toLowerCase() === "approved"
+                      ? "bg-success/10 text-success border-success/20"
+                      : leaveForm.status?.toLowerCase() === "rejected"
+                        ? "bg-destructive/10 text-destructive border-destructive/20"
+                        : "bg-warning/10 text-warning border-warning/20"
+                  }`}
                 >
                   {leaveForm.status || "PENDING"}
                 </div>
@@ -232,7 +259,9 @@ const LeaveAgreementPage = () => {
             {/* Middle Details Section */}
             <div className="py-6 grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
               <div className="flex flex-col">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Jenis Cuti</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                  Jenis Cuti
+                </p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-primary">
                     <Box size={16} />
@@ -244,33 +273,59 @@ const LeaveAgreementPage = () => {
               </div>
 
               <div className="flex flex-col">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Durasi</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                  Durasi
+                </p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center text-yellow-600">
                     <CircleCheck size={16} />
                   </div>
                   <p className="text-base font-bold text-blue-dark">
-                    {calculateDuration(leaveForm.start_date, leaveForm.end_date)} Hari
+                    {calculateDuration(
+                      leaveForm.start_date,
+                      leaveForm.end_date,
+                    )}{" "}
+                    Hari
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-col col-span-2 md:col-span-1 border-t md:border-t-0 border-l-0 md:border-l pl-0 md:pl-4 border-border/60 pt-4 md:pt-0">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Tanggal</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                  Tanggal
+                </p>
                 <p className="text-sm font-bold text-blue-dark bg-slate-50 border border-border px-3 py-1.5 rounded-md inline-block w-fit">
-                  {new Date(leaveForm.start_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })} 
-                  <span className="text-muted-foreground mx-2 font-normal">s/d</span> 
-                  {new Date(leaveForm.end_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                  {new Date(leaveForm.start_date).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                  <span className="text-muted-foreground mx-2 font-normal">
+                    s/d
+                  </span>
+                  {new Date(leaveForm.end_date).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
                 </p>
               </div>
             </div>
 
             {/* Bottom Reason Section */}
             <div className="pb-6">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Alasan Cuti</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                Alasan Cuti
+              </p>
               <div className="bg-blue-50/50 border border-blue-100/50 p-4 rounded-xl relative">
                 <div className="absolute top-4 left-4 text-blue-primary/20">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path d="M14.017 21L16.411 14.5938C14.075 14.5938 12.35 12.8727 12.35 10.5975C12.35 8.28045 14.162 6.51866 16.536 6.51866C18.91 6.51866 21 8.36294 21 10.9765C21 14.4752 18.239 20.3547 14.017 21ZM3 21L5.394 14.5938C3.058 14.5938 1.333 12.8727 1.333 10.5975C1.333 8.28045 3.145 6.51866 5.519 6.51866C7.893 6.51866 9.983 8.36294 9.983 10.9765C9.983 14.4752 7.222 20.3547 3 21Z" />
                   </svg>
                 </div>
@@ -280,14 +335,13 @@ const LeaveAgreementPage = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            {leaveForm.status?.toLowerCase() === 'pending' && (
+            {leaveForm.status?.toLowerCase() === "pending" && (
               <div className="flex gap-3 justify-end pt-4 border-t border-border/60">
                 <button
                   type="button"
                   disabled={isProcessing}
                   onClick={() => handleAction("reject")}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 font-semibold text-sm transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg border border-red-200 text-red-600 bg-red-50 cursor-pointer hover:bg-red-100 font-semibold text-sm transition-colors disabled:opacity-50"
                 >
                   <CircleX size={16} />
                   Tolak
@@ -296,24 +350,24 @@ const LeaveAgreementPage = () => {
                   type="button"
                   disabled={isProcessing}
                   onClick={() => handleAction("approve")}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-white bg-blue-primary hover:bg-blue-600 font-semibold text-sm shadow-sm transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-white bg-blue-primary hover:bg-blue-600 cursor-pointer font-semibold text-sm shadow-sm transition-colors disabled:opacity-50"
                 >
                   <CircleCheck size={16} />
                   Terima Cuti
                 </button>
               </div>
             )}
-            
-            {leaveForm.status?.toLowerCase() !== 'pending' && (
-               <div className="flex justify-end pt-4 border-t border-border/60">
-                 <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="px-6 py-2.5 rounded-lg border border-border text-muted-foreground bg-slate-50 hover:bg-slate-100 font-semibold text-sm transition-colors"
-                 >
-                   Tutup
-                 </button>
-               </div>
+
+            {leaveForm.status?.toLowerCase() !== "pending" && (
+              <div className="flex justify-end pt-4 border-t border-border/60">
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="px-6 py-2.5 rounded-lg border border-border text-muted-foreground bg-slate-50 hover:bg-slate-100 font-semibold text-sm transition-colors"
+                >
+                  Tutup
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -322,12 +376,25 @@ const LeaveAgreementPage = () => {
   );
 };
 
-// Helper component for Badge
-const Badge = ({ children, variant = "blue" }: { children: React.ReactNode, variant?: "blue" | "outline" }) => {
+const Badge = ({
+  children,
+  variant = "blue",
+}: {
+  children: React.ReactNode;
+  variant?: "blue" | "outline";
+}) => {
   if (variant === "outline") {
-    return <span className="px-2.5 py-1 rounded-md text-[11px] font-bold border border-border text-muted-foreground uppercase tracking-wider">{children}</span>;
+    return (
+      <span className="px-2.5 py-1 rounded-md text-[11px] font-bold border border-border text-muted-foreground uppercase tracking-wider">
+        {children}
+      </span>
+    );
   }
-  return <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-100 text-blue-primary uppercase tracking-wider">{children}</span>;
+  return (
+    <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-100 text-blue-primary uppercase tracking-wider">
+      {children}
+    </span>
+  );
 };
 
 export default LeaveAgreementPage;
