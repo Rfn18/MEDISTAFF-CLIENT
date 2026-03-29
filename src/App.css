@@ -7,3 +7,21 @@ body {
 body {
   font-family: "Poppins", sans-serif;
 }
+
+#reader img {
+  display: none !important;
+}
+#reader b {
+  display: none !important;
+}
+#reader button {
+  display: none !important;
+}
+#reader select {
+  display: none !important;
+}
+#reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}

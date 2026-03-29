@@ -6,6 +6,7 @@ import SideModal from "../../../components/ui/Modal";
 import DepartmentForm from "../../../components/form/admin/DepartmentForm";
 import type { Department as DepartmentType } from "../../../types/userType";
 import axios from "axios";
+import api from "../../../services/api";
 
 export default function Department() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -18,7 +19,7 @@ export default function Department() {
 
   const fetchDepartment = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/departments`);
+      const response = await api.get(`/departments`);
       const data = response.data.data.datas.data;
       setDepartmentData(data);
     } catch (error) {
@@ -46,7 +47,7 @@ export default function Department() {
 
   const handleUpdateDepartment = async (data: DepartmentType) => {
     try {
-      await axios.post(`${baseUrl}/api/departments/${departmentForm?.id}`, {
+      await api.post(`/departments/${departmentForm?.id}`, {
         ...data,
         _method: "PUT",
       });
@@ -61,7 +62,7 @@ export default function Department() {
 
   const handleDeleteDepartment = async (row: DepartmentType) => {
     try {
-      await axios.delete(`${baseUrl}/api/departments/${row.id}`);
+      await api.delete(`/departments/${row.id}`);
       fetchDepartment();
     } catch (error) {
       console.error("delete error", error);

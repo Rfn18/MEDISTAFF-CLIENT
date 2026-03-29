@@ -6,6 +6,7 @@ import SideModal from "../../../components/ui/Modal";
 import type { Position } from "../../../types/userType";
 import axios from "axios";
 import PositionForm from "../../../components/form/admin/PositionForm";
+import api from "../../../services/api";
 
 export default function Position() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -32,7 +33,7 @@ export default function Position() {
     setPositionForm(data);
 
     try {
-      await axios.post(`${baseUrl}/api/positions`, data);
+      await api.post(`/positions`, data);
       setPositionForm(null);
       fetchPosition();
     } catch (error) {
@@ -44,7 +45,7 @@ export default function Position() {
 
   const handleDeletePosition = async (row: Position) => {
     try {
-      await axios.delete(`${baseUrl}/api/positions/${row.id}`);
+      await api.delete(`/positions/${row.id}`);
       fetchPosition();
     } catch (error) {
       console.error("delete error", error);
@@ -58,7 +59,7 @@ export default function Position() {
 
   const handleUpdatePosition = async (data: Position) => {
     try {
-      await axios.post(`${baseUrl}/api/positions/${positionForm?.id}`, {
+      await api.post(`/positions/${positionForm?.id}`, {
         ...data,
         _method: "PUT",
       });

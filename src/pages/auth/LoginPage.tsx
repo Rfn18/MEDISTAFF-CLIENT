@@ -2,14 +2,13 @@ import { Eye, EyeClosed, LoaderCircle, Lock, Mail } from "lucide-react";
 import { AuthCard } from "../../components/auth/AuthCardt";
 import { Link, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import { getDeviceId } from "../../utils/getDeviceId";
+import api from "../../services/api";
 
 export const Login = () => {
   const [showPw, setShowPw] = useState<boolean>(false);
   const [data, setData] = useState({
     email: "",
     password: "",
-    device_id: "",
   });
   const [alert, setAlert] = useState<boolean>(false);
   const [errorAlert, setErrorAlert] = useState<boolean>(false);
@@ -17,10 +16,6 @@ export const Login = () => {
 
   const navigate = useNavigate();
   const auth = localStorage.getItem("auth");
-
-  useEffect(() => {
-    setData({ ...data, device_id: getDeviceId() });
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -31,21 +26,11 @@ export const Login = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://127.0.0.1:8000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await api.post("/login", data);
 
-      if (!response.ok) {
-        throw new Error("failed to fething data");
-      }
-
-      const result = await response.json();
+      const result = response.data;
       const authData = result.data;
+      console.log(result)
 
       localStorage.setItem("auth", JSON.stringify(authData));
     } catch (error) {
@@ -66,6 +51,8 @@ export const Login = () => {
       setLoading(false);
     }
   };
+
+  console.log(data)
 
   useEffect(() => {
     const indicatorAlert = localStorage.getItem("alert");

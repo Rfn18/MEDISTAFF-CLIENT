@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { getDeviceId } from "../../utils/getDeviceId";
+import api from "../../services/api";
 
 interface StandForm {
   id: number;
@@ -33,9 +35,10 @@ export const Register = () => {
   const [data, setData] = useState({
     name: "",
     email: "",
-    stand_id: "",
+    nip: "",
     password: "",
     password_confirmation: "",
+    device_id: "",
   });
 
   const handleChange = (
@@ -44,21 +47,15 @@ export const Register = () => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
+  useEffect(() => {
+    setData({ ...data, device_id: getDeviceId() });
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await fetch("http://127.0.0.1:8000/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("error fetching data");
-      }
+      await api.post("/register", data);
 
       localStorage.setItem("alert", "true");
       navigate("/login");
@@ -72,7 +69,7 @@ export const Register = () => {
   useEffect(() => {
     const fetchDataStand = async () => {
       try {
-        const response = await axios.get(`${url}/api/stand`);
+        const response = await api.get(`/stand`);
         const data = response.data.data.datas.data;
         setStandList(data);
       } catch (error) {

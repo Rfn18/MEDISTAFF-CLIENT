@@ -33,10 +33,17 @@ export function EmployeeTable({
       header: "Karyawan",
       render: (row: Employee) => (
         <div className="flex gap-4">
-          <img
-            src={`http://127.0.0.1:8000/storage/employee/1774284184.fasterino-rafael.jpg`}
-            className="w-10 h-10 object-cover object-center rounded-full"
-          />
+          {row.photo ? (
+            <img
+              src={`${import.meta.env.VITE_API_BASE_URL}/storage/employee/${row.photo}`}
+              className="w-10 h-10 object-cover object-center rounded-full"
+            />
+          ) : (
+            <img
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.full_name || "User")}&background=cce3de&color=03045e`}
+              className="w-10 h-10 object-cover object-center rounded-full"
+            />
+          )}
           <div>
             <h1 className="font-semibold">{row.full_name}</h1>
             <p className="text-sm">{row.email}</p>

@@ -351,9 +351,6 @@ const ScheduleListPage = () => {
       );
     } catch (error) {
       console.error("Gagal update shift detail", error);
-      alert(
-        "Gagal update shift. " + (error as any).response?.data?.message || "",
-      );
     } finally {
       setUpdatingCells((prev) => ({ ...prev, [cellKey]: false }));
     }

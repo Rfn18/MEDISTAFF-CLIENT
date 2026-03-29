@@ -6,6 +6,7 @@ import SideModal from "../../../components/ui/Modal";
 import EmployeeForm from "../../../components/form/admin/EmployeeForm";
 import type { Employee as EmployeeType } from "../../../types/userType";
 import axios from "axios";
+import api from "../../../services/api";
 
 export default function Employee() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -16,7 +17,7 @@ export default function Employee() {
 
   const fetchEmployee = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/employees`);
+      const response = await api.get(`/employees`);
       const data = response.data.data.datas.data;
       setEmployeeData(data);
     } catch (error) {
@@ -32,7 +33,7 @@ export default function Employee() {
     setEmployeeForm(data);
 
     try {
-      await axios.post(`${baseUrl}/api/employees`, data);
+      await api.post(`/employees`, data);
       setEmployeeForm(null);
       fetchEmployee();
     } catch (error) {
@@ -45,8 +46,8 @@ export default function Employee() {
   const handleInactivateEmployee = async (row: EmployeeType) => {
     const newStatus = row.employee_status === "active" ? "inactive" : "active";
     try {
-      const response = await axios.post(
-        `${baseUrl}/api/employees/${row.id}/status`,
+      const response = await api.post(
+        `/employees/${row.id}/status`,
         {
           employee_status: newStatus,
           _method: "PUT",
@@ -66,7 +67,7 @@ export default function Employee() {
 
   const handleUpdateEmployee = async (data: EmployeeType) => {
     try {
-      await axios.post(`${baseUrl}/api/employees/${employeeForm?.id}`, {
+      await api.post(`/employees/${employeeForm?.id}`, {
         ...data,
         _method: "PUT",
       });

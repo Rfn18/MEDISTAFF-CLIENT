@@ -33,16 +33,16 @@ const ScanPage = () => {
         { facingMode: cameraMode },
         {
           fps: 10,
-          qrbox: 250,
+          qrbox: (viewfinderWidth, viewfinderHeight) => {
+            return { width: viewfinderWidth * 0.7, height: viewfinderHeight * 0.7 };
+          },
         },
         (decodedText) => {
-          handleAttendance(decodedText);
+          handleAttendance(JSON.parse(decodedText));
           scanner.stop();
           setIsScanning(false);
         },
-        (errorMessage) => {
-          setIsScanning(false);
-        },
+        (errorMessage) => {},
       );
     } catch (error) {
       console.error("error scanning", error);
@@ -53,6 +53,8 @@ const ScanPage = () => {
   const handleAttendance = async (decodedText: string) => {
     console.log("decoded text", decodedText);
   };
+
+  console.log(isScanning)
   return (
     <Layout>
       <div className="flex flex-col items-center p-6 bg-gray-50 min-h-screen">
@@ -74,11 +76,17 @@ const ScanPage = () => {
             </div>
           )}
 
+          <div className="relative w-72 h-72 overflow-hidden rounded-3xl">
+          <div id="reader"></div>
+          
           {isScanning && (
-            <div className="absolute inset-0 pointer-events-none border-[50px] border-black/40">
-              <div className="w-full h-1 bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.8)] animate-pulse mt-32"></div>
-            </div>
+            <>
+              <div className="absolute inset-0 border-[40px] border-black/30 pointer-events-none"></div>
+              
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-500 shadow-[0_0_15px_#3b82f6] animate-scan-loop"></div>
+            </>
           )}
+        </div>
         </div>
         <div className="flex justify-center items-center gap-4 mt-4 max-w-md">
           <p className="text-sm text-blue-dark italic text-center">
