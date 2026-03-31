@@ -229,8 +229,8 @@ const ScheduleListPage = () => {
   const stats = useMemo(() => {
     const totalEmployees = employeeShift.length;
     let pagi = 0,
-      malam = 0,
-      siang = 0,
+    siang = 0,
+    malam = 0,
       off = 0;
     const todayIndex = today - 1;
 
@@ -240,11 +240,11 @@ const ScheduleListPage = () => {
           case "P":
             pagi++;
             break;
-          case "M":
-            malam++;
-            break;
           case "S":
             siang++;
+            break;
+          case "M":
+            malam++;
             break;
           case "O":
             off++;
@@ -333,7 +333,7 @@ const ScheduleListPage = () => {
     setUpdatingCells((prev) => ({ ...prev, [cellKey]: true }));
 
     try {
-      await axios.put(`${baseUrl}/api/shift-schedule-details/${detailId}`, {
+      await api.put(`/shift-schedule-details/${detailId}`, {
         shift_id: shiftData.shift_id,
         is_off: shiftData.is_off ? 1 : 0,
       });

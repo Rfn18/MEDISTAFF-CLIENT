@@ -14,7 +14,7 @@ import type { QrToken } from "../../../types/attendanceType";
 import { useAuth } from "../../../context/AuthContext";
 
 const QRCodePage = () => {
-  const [qrToken, setQrToken] = useState<QrToken>({qr_payload: "", device_id: "", longtitude: 0, latitude: 0, employee_id: 0});
+  const [qrToken, setQrToken] = useState<QrToken>({qr_payload: "", device_id: "", longitude: 0, latitude: 0, user_id: 0});
   const [countdownTimer, setCountdownTimer] = useState<number>(30);
   const [loading, setLoading] = useState<boolean>(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
@@ -30,7 +30,7 @@ const QRCodePage = () => {
       setLoading(true);
       const response = await api.get(`/dinamic-qr`);
       const data = response.data;
-      setQrToken({...qrToken, qr_payload: data.qr_payload, device_id: device_id!, employee_id: user?.id!});
+      setQrToken({...qrToken, qr_payload: data.qr_payload, device_id: device_id!, user_id: user?.id!});
     } catch (error) {
       console.error("fetching qr code error", error);
     } finally {
@@ -96,9 +96,11 @@ const QRCodePage = () => {
 
   useEffect(() => {
     if (location) {
-      setQrToken({...qrToken, longtitude: location.lng, latitude: location.lat})
+      setQrToken({...qrToken, longitude: location.lng, latitude: location.lat})
     }
   }, [location]);
+
+  console.log(qrToken.qr_payload)
 
   return (
     <Layout>
@@ -127,7 +129,7 @@ const QRCodePage = () => {
             ) : (
               isQrCode && (
                 <div className="bg-white p-5 rounded-xl inline-block animate-[floatUp_0.3s_ease-out]">
-                  <QRCodeCanvas value={JSON.stringify(qrToken)} size={300} level={"M"} />
+                  <QRCodeCanvas value={JSON.stringify(qrToken)} size={300} level={"L"} />
                 </div>
               )
             )}

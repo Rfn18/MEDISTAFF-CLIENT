@@ -33,7 +33,7 @@ export interface Attendance {
 export type QrToken = {
   qr_payload: string;
   device_id: string;
-  longtitude: number;
+  longitude: number;
   latitude: number;
-  employee_id: number;
+  user_id: number;
 }

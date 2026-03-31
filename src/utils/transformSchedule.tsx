@@ -46,9 +46,9 @@ export const transformSchedule = (
         item.shift_id === 1
           ? "P"
           : item.shift_id === 2
-            ? "M"
+            ? "S"
             : item.shift_id === 3
-              ? "S"
+              ? "M"
               : "";
     }
   });
@@ -62,9 +62,9 @@ export const shiftCodeToId = (
   switch (code) {
     case "P":
       return { shift_id: 1, is_off: false };
-    case "M":
-      return { shift_id: 2, is_off: false };
     case "S":
+      return { shift_id: 2, is_off: false };
+    case "M":
       return { shift_id: 3, is_off: false };
     case "O":
       return { shift_id: null, is_off: true };
