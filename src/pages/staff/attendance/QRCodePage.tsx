@@ -10,30 +10,27 @@ import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import { QRCodeCanvas } from "qrcode.react";
 import { Loading } from "../../../components/ui/load";
-
-type QrToken = {
-  qr_payload: string;
-  device_id: string;
-  longtitude: number;
-  latitude: number;
-}
+import type { QrToken } from "../../../types/attendanceType";
+import { useAuth } from "../../../context/AuthContext";
 
 const QRCodePage = () => {
-  const [qrToken, setQrToken] = useState<QrToken>({qr_payload: "", device_id: "", longtitude: 0, latitude: 0});
+  const [qrToken, setQrToken] = useState<QrToken>({qr_payload: "", device_id: "", longtitude: 0, latitude: 0, employee_id: 0});
   const [countdownTimer, setCountdownTimer] = useState<number>(30);
   const [loading, setLoading] = useState<boolean>(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     null,
   );
 
+  const [isQrCode, setIsQrCode] = useState<boolean>(false);
   const device_id = localStorage.getItem("device_id");
+  const {user} = useAuth()
 
   const fetchQrCode = async () => {
     try {
       setLoading(true);
       const response = await api.get(`/dinamic-qr`);
       const data = response.data;
-      setQrToken({...qrToken, qr_payload: data.qr_payload, device_id: device_id!});
+      setQrToken({...qrToken, qr_payload: data.qr_payload, device_id: device_id!, employee_id: user?.id!});
     } catch (error) {
       console.error("fetching qr code error", error);
     } finally {
@@ -41,20 +38,23 @@ const QRCodePage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchQrCode();
-    const timer = setInterval(() => {
-      fetchQrCode();
-    }, 30000);
+  const startCountdown = async() => {
+    setIsQrCode(true);
+    await fetchQrCode();
     const countdownTimer = setInterval(() => {
       setCountdownTimer((prev) => (prev > 0 ? prev - 1 : 30));
     }, 1000);
 
     return () => {
-      clearInterval(timer);
       clearInterval(countdownTimer);
     };
-  }, []);
+  }
+
+  useEffect(() => {
+    if(countdownTimer === 0) {
+      setIsQrCode(false);
+    }
+  }, [countdownTimer]);
 
   const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
     return new Promise((resolve, reject) => {
@@ -118,18 +118,26 @@ const QRCodePage = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center w-full py-16">
+            {!isQrCode && (
+              <button onClick={startCountdown} className="bg-primary text-white px-8 py-2 rounded-full font-semibold transition hover:cursor-pointer hover:bg-blue-dark hover:text-white">Generate QR Code</button>
+            )}
+            
             {loading ? (
               <Loading message="Memuat QR Code..." />
             ) : (
-              <div className="bg-white p-5 rounded-xl inline-block animate-[floatUp_0.3s_ease-out]">
-                <QRCodeCanvas value={JSON.stringify(qrToken)} size={300} level={"M"} />
-              </div>
+              isQrCode && (
+                <div className="bg-white p-5 rounded-xl inline-block animate-[floatUp_0.3s_ease-out]">
+                  <QRCodeCanvas value={JSON.stringify(qrToken)} size={300} level={"M"} />
+                </div>
+              )
             )}
           </div>
         </CardContent>
         <CardFooter>
           <p className="mt-4 text-blue-dark">
-            QR Code akan diperbarui dalam <b>{countdownTimer} detik</b>.
+          {isQrCode && !loading && (
+            <p>QR Code akan diperbarui dalam <b>{countdownTimer} detik</b>.</p>
+          )}
           </p>
         </CardFooter>
       </Card>
