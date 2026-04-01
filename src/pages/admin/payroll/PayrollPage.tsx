@@ -8,6 +8,7 @@ import {
   BanknoteX,
   CircleDollarSign,
   Plus,
+  CheckCircle2Icon,
 } from "lucide-react";
 import Layout from "../../../components/layouts/DashboardLayout";
 import api from "../../../services/api";
@@ -16,6 +17,7 @@ import { Loading } from "../../../components/ui/load";
 import { toRupiah } from "../../../utils/toRupiah";
 import type { Allowance, Deduction } from "../../../types/payrollType";
 import { Card } from "../../../components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "../../../components/ui/alert";
 
 const MONTHS = [
   "Januari",
@@ -72,7 +74,7 @@ export default function PayrollPage() {
   const [processingEmp, setProcessingEmp] = useState<Employee | null>(null);
   const [baseSalaryInput, setBaseSalaryInput] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [successAlert, setSuccessAlert] = useState<boolean>(false);
   const yearOptions = Array.from(
     new Array(5),
     (_, i) => currentDate.getFullYear() - 2 + i,
@@ -95,7 +97,7 @@ export default function PayrollPage() {
         year: selectedYear,
       });
 
-      setPayrolls(payRes.data.datas || payRes.data.data || payRes.data || []);
+      setPayrolls(payRes.data.data.datas.data || []);
     } catch (error) {
       console.error("Failed to fetch payroll data:", error);
     } finally {
@@ -120,7 +122,7 @@ export default function PayrollPage() {
       setAllowance(data);
     } catch (error) {
       console.error("Failed to fetch allowance data:", error);
-    }
+    } 
   };
 
   const fetchDeduction = async () => {
@@ -169,20 +171,16 @@ export default function PayrollPage() {
           name: isDeductionCustom ? customDeduction.name : null,
         },
       };
-      console.log(payload);
-
-      // if (baseSalaryInput.trim() !== "") {
-      //   payload.base_salary = parseInt(baseSalaryInput, 10);
-      // }
-
-      // await api.post("/payroll-generates", payload);
-
-      // await fetchData();
-      // setIsModalOpen(false);
+      if (baseSalaryInput.trim() !== "") {
+        payload.base_salary = parseInt(baseSalaryInput, 10);
+      }
+      await api.post("/payroll-generates", payload);
+      await fetchData();
+      setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to generate payroll:", error);
-      alert("Gagal memproses gaji. Silakan periksa koneksi dan coba lagi.");
     } finally {
+      setSuccessAlert(true);
       setIsSubmitting(false);
     }
   };
@@ -227,10 +225,17 @@ export default function PayrollPage() {
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
-
-  console.log(selectedAllowances, selectedDeductions);
   return (
     <Layout>
+     {successAlert && (
+      <Alert className="fixed bottom-0 right-0 m-4 shadow border-none text-success w-80 animate-[slideIn_.6s_ease-in-out]">
+        <CheckCircle2Icon className="text-success" />
+        <AlertTitle>Success!</AlertTitle>
+        <AlertDescription className="text-success/60 text-xs">
+           Karayawan telah digaji
+        </AlertDescription>
+      </Alert>
+      )}
       <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto px-2 lg:px-4 text-slate-800 bg-[#F8FAFC] pb-12 animate-[fadeIn_0.3s_ease-out]">
         <div className="mt-4">
           <h1 className="text-xl font-bold tracking-tight text-blue-dark flex items-center gap-2">
@@ -723,14 +728,14 @@ export default function PayrollPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 min-h-[44px] font-semibold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-slate-800 transition-colors"
+                  className="flex-1 cursor-pointer min-h-[44px] font-semibold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-slate-800 transition-colors"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 min-h-[44px] font-semibold bg-[#0062FF] text-white rounded-xl hover:bg-[#0055DD] shadow-md shadow-[#0062FF]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                  className="flex-1 cursor-pointer min-h-[44px] font-semibold bg-[#0062FF] text-white rounded-xl hover:bg-[#0055DD] shadow-md shadow-[#0062FF]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                 >
                   {isSubmitting ? (
                     <>

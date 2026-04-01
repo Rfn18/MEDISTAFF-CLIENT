@@ -29,6 +29,16 @@ export interface Attendance {
   ];
 }
 
+export interface AttendanceSummary {
+  employee_id: number;
+  month: number;
+  year: number;
+  total_present: number;
+  total_absent: number;
+  total_late: number;
+  total_off: number;
+  total_sick: number;
+}
 
 export type QrToken = {
   qr_payload: string;

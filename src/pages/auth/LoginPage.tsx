@@ -51,8 +51,6 @@ export const Login = () => {
     }
   };
 
-  console.log(data);
-
   useEffect(() => {
     const indicatorAlert = localStorage.getItem("alert");
 

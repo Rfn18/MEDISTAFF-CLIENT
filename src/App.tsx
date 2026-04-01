@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Login } from "./pages/auth/LoginPage";
 import { Register } from "./pages/auth/RegisterPage";
 import Dashboard from "./pages/admin/DashboardPage";
@@ -23,14 +23,36 @@ import FluxAdminDashboard from "./pages/admin/attendance/FluxAdminDashboard";
 import FluxEmployeeDashboard from "./pages/staff/attendance/FluxEmployeeDashboard";
 import PayrollPage from "./pages/admin/payroll/PayrollPage";
 import PayrollComponent from "./pages/admin/payroll/PayrollComponent";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
+  const {user} = useAuth();
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<h1>Home</h1>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+       {user ? (
+          <>
+            {user.role_id === 2 ? (
+              <>
+                <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="/login" element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="/register" element={<Navigate to="/admin/dashboard" replace />} />
+              </>
+            ) : (
+              <>
+                <Route path="/" element={<Navigate to="/staff/dashboard" replace />} />
+                <Route path="/login" element={<Navigate to="/staff/dashboard" replace />} />
+                <Route path="/register" element={<Navigate to="/staff/dashboard" replace />} />
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </>
+        )}
 
         <Route element={<AdminMiddleware />}>
           {/* Admin */}

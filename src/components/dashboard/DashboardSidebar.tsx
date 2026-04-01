@@ -94,7 +94,7 @@ const DashboardSidebar = () => {
   return (
     <div
       className={`flex flex-col h-full bg-accent-foreground transition-all duration-300 ease-in-out overflow-hidden ${
-        isSidebarOpen ? "w-70 p-6" : "w-23 p-6"
+        isSidebarOpen ? "w-60 p-6" : "w-23 p-6"
       }`}
     >
       <div className="flex items-center gap-3 min-w-max">

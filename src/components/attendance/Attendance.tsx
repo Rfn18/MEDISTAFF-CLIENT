@@ -81,7 +81,7 @@ export function AttendanceTable({ data }: { data: Attendance[] }) {
       render: (row: Attendance) => row.id,
     },
     {
-      header: "Jenis Cuti",
+      header: "Karyawan",
       render: (row: Attendance) => {
         const employees = employee?.find((item) => item.id === row.employee_id);
         return (
@@ -143,6 +143,85 @@ export function AttendanceTable({ data }: { data: Attendance[] }) {
           </Link>
         </div>
       ),
+    },
+  ];
+  return <DataTable columns={columns} data={data} />;
+}
+
+
+export function AttendanceTableUser({ data }: { data: Attendance[] }) {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "late":
+        return "bg-red-50 text-red-600 border-red-200";
+      case "present":
+        return "bg-green-50 text-green-600 border-green-200";
+      default:
+        return "bg-gray-50 text-gray-600 border-gray-200";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "late":
+        return "Terlambat";
+      case "present":
+        return "Hadir";
+      default:
+        return "Tidak Hadir";
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    return (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(status)}`}
+      >
+        {getStatusText(status)}
+      </span>
+    );
+  };
+  const columns: Column<Attendance>[] = [
+    {
+      header: "No",
+      accessor: "id",
+    },
+    {
+      header: "Hari",
+      render: (row: Attendance) => {
+        const day = new Date(row.attendance_date).toLocaleDateString("id-ID", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+       return (
+          <div className="flex gap-4">
+           <p>{day}</p>
+          </div>
+        );
+      },
+    },
+    {
+      header: "Status",
+      render: (row: Attendance) => {
+        return (<div className="flex items-center gap-2">
+          {getStatusBadge(row.status)}
+          <p className="text-xs">{row.late_minutes} Menit</p>
+        </div>);
+      },
+    },
+
+    {
+      header: "Check In",
+      render: (row: Attendance) => (
+          <p>{formatTime(row.check_in_time)}</p>
+      ),
+    },
+    {
+      header: "Check Out",
+      render: (row: Attendance) =>
+        row.check_out_time ? formatTime(row.check_out_time) : "-",
     },
   ];
   return <DataTable columns={columns} data={data} />;

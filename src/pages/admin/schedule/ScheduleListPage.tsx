@@ -223,9 +223,7 @@ const ScheduleListPage = () => {
   const filteredSchedule = employeeShift.filter((item: any) => {
     return item.name?.toLowerCase().includes(searchTerm.toLowerCase());
   });
-
-  console.log(filteredSchedule);
-
+  
   const stats = useMemo(() => {
     const totalEmployees = employeeShift.length;
     let pagi = 0,

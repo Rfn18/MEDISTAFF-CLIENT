@@ -80,7 +80,6 @@ const ScanPage = () => {
 
   const handleAttendance = async (decodedText: QrToken) => {
     const data = decodedText;
-    console.log(data)
     try {
       setLoading(true);
       await api.post(`/check-in`, data);
