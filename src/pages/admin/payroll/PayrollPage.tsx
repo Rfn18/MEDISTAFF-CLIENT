@@ -7,13 +7,13 @@ import {
   RefreshCw,
   BanknoteX,
   CircleDollarSign,
+  Plus,
 } from "lucide-react";
 import Layout from "../../../components/layouts/DashboardLayout";
 import api from "../../../services/api";
 import type { Employee, Payroll, Position } from "../../../types/userType";
 import { Loading } from "../../../components/ui/load";
 import { toRupiah } from "../../../utils/toRupiah";
-import SelectField from "../../../components/ui/selectField";
 import type { Allowance, Deduction } from "../../../types/payrollType";
 import { Card } from "../../../components/ui/card";
 
@@ -50,15 +50,29 @@ export default function PayrollPage() {
 
   const [selectedAllowances, setSelectedAllowances] = useState<number[]>([]);
   const [selectedDeductions, setSelectedDeductions] = useState<number[]>([]);
+  const [isAllowanceCustom, setIsAllowanceCustom] = useState<boolean>(false);
+  const [customAllowance, setCustomAllowance] = useState<{
+    name: string;
+    amount: number;
+  }>({
+    name: "",
+    amount: 0,
+  });
+  const [isDeductionCustom, setIsDeductionCustom] = useState<boolean>(false);
+  const [customDeduction, setCustomDeduction] = useState<{
+    name: string;
+    amount: number;
+  }>({
+    name: "",
+    amount: 0,
+  });
   const [loading, setLoading] = useState(true);
 
-  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [processingEmp, setProcessingEmp] = useState<Employee | null>(null);
   const [baseSalaryInput, setBaseSalaryInput] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Generate Year Options
   const yearOptions = Array.from(
     new Array(5),
     (_, i) => currentDate.getFullYear() - 2 + i,
@@ -68,13 +82,13 @@ export default function PayrollPage() {
     setLoading(true);
     try {
       const empRes = await api.get("/employees");
-      console.log(empRes);
-      const activeEmployees =
-        empRes?.data.data.datas.data?.filter(
+      const activeEmployees = empRes?.data?.data?.datas?.data || [];
+      setEmployees(
+        activeEmployees.filter(
           (e: Employee) =>
             e.employee_status === "active" || e.employee_status === "inactive",
-        ) || [];
-      setEmployees(activeEmployees);
+        ),
+      );
 
       const payRes = await api.post("/payroll-by-period", {
         month: selectedMonth,
@@ -142,16 +156,29 @@ export default function PayrollPage() {
         employee_id: processingEmp.id,
         month: selectedMonth,
         year: selectedYear,
+        allowance: {
+          is_custom: isAllowanceCustom,
+          allowance_id: selectedAllowances,
+          amount: isAllowanceCustom ? customAllowance.amount : null,
+          name: isAllowanceCustom ? customAllowance.name : null,
+        },
+        deduction: {
+          is_custom: isDeductionCustom,
+          deduction_id: selectedDeductions,
+          amount: isDeductionCustom ? customDeduction.amount : null,
+          name: isDeductionCustom ? customDeduction.name : null,
+        },
       };
+      console.log(payload);
 
-      if (baseSalaryInput.trim() !== "") {
-        payload.base_salary = parseInt(baseSalaryInput, 10);
-      }
+      // if (baseSalaryInput.trim() !== "") {
+      //   payload.base_salary = parseInt(baseSalaryInput, 10);
+      // }
 
-      await api.post("/payroll-generates", payload);
+      // await api.post("/payroll-generates", payload);
 
-      await fetchData();
-      setIsModalOpen(false);
+      // await fetchData();
+      // setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to generate payroll:", error);
       alert("Gagal memproses gaji. Silakan periksa koneksi dan coba lagi.");
@@ -169,7 +196,7 @@ export default function PayrollPage() {
           payrollData: null,
         };
       }
-      const matchedPayroll = payrolls.find(
+      const matchedPayroll = payrolls?.find(
         (p) =>
           p.employee_id === emp.id &&
           Number(p.month) === selectedMonth &&
@@ -201,6 +228,7 @@ export default function PayrollPage() {
     );
   };
 
+  console.log(selectedAllowances, selectedDeductions);
   return (
     <Layout>
       <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto px-2 lg:px-4 text-slate-800 bg-[#F8FAFC] pb-12 animate-[fadeIn_0.3s_ease-out]">
@@ -382,9 +410,8 @@ export default function PayrollPage() {
         </div>
       </div>
 
-      {/* Process Payroll Modal */}
       {isModalOpen && processingEmp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] ">
+        <div className="fixed inset-0 z-999999 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] ">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-[slideUp_0.2s_ease-out] max-h-[calc(100vh-4rem)] overflow-y-auto">
             <div className="p-6 border-b border-slate-100">
               <h2 className="text-xl font-bold text-slate-900">
@@ -397,7 +424,6 @@ export default function PayrollPage() {
             </div>
 
             <form onSubmit={handleProcessPayroll} className="p-6">
-              {/* Detail Pegawai Singkat */}
               <div className="flex gap-3 items-center bg-slate-50 p-3 rounded-xl mb-6 border border-slate-100">
                 <img
                   src={
@@ -418,7 +444,6 @@ export default function PayrollPage() {
                 </div>
               </div>
 
-              {/* Base Salary Input (Optional) */}
               <div className="mb-4">
                 <div className="flex items-center justify-between">
                   <label
@@ -453,14 +478,13 @@ export default function PayrollPage() {
                 </div>
               </div>
 
-              {/* Attendance Bonus Input (Optional) */}
               <div className="mb-4">
                 <div className="flex items-center justify-between">
                   <label
                     className="block text-sm font-semibold text-blue-dark mb-1.5"
                     htmlFor="Jam Lembur"
                   >
-                    Tunjangan{" "}
+                    Potongan{" "}
                     <span className="text-slate-400 font-normal">
                       (Opsional)
                     </span>
@@ -468,7 +492,6 @@ export default function PayrollPage() {
                 </div>
                 <Card className="w-full border-none">
                   <div className="relative">
-                    {/* Search */}
                     <div className="px-2 pt-2">
                       <label className="sr-only">Search</label>
 
@@ -485,7 +508,6 @@ export default function PayrollPage() {
                       </div>
                     </div>
 
-                    {/* List */}
                     <ul className="h-fit max-h-40 overflow-y-auto p-2 text-sm text-body font-medium">
                       {deduction.map((item) => (
                         <li
@@ -511,6 +533,68 @@ export default function PayrollPage() {
                           </div>
                         </li>
                       ))}
+                      <li className="hover:bg-background cursor-pointer">
+                        <div
+                          onClick={() =>
+                            setIsDeductionCustom(!isDeductionCustom)
+                          }
+                          className="flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isDeductionCustom}
+                            className="w-4 h-4 border border-default-strong rounded bg-blue-dark focus:ring-2 focus:ring-blue-dark cursor-pointer"
+                          />
+
+                          <label className="w-full ms-2 text-sm font-medium text-heading cursor-pointer">
+                            Custom?
+                          </label>
+                        </div>
+                      </li>
+                      {isDeductionCustom && (
+                        <li>
+                          <div className="flex flex-col w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md cursor-pointer">
+                            <label
+                              htmlFor="custom-deduction"
+                              className="self-start"
+                            >
+                              - Nama
+                            </label>
+                            <input
+                              type="text"
+                              name="name"
+                              onChange={(e) =>
+                                setCustomDeduction({
+                                  ...customDeduction,
+                                  name: e.target.value,
+                                })
+                              }
+                              placeholder="Exp: Potongan Etika"
+                              className="block ml-2 mt-1 w-full pl-4 pe-3 py-2.5 bg-neutral-secondary-strong border border-border text-heading text-sm rounded focus:ring-brand focus:border-brand placeholder:text-body"
+                            />
+                          </div>
+                          <div className="flex flex-col w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md cursor-pointer">
+                            <label
+                              htmlFor="custom-allowance"
+                              className="self-start"
+                            >
+                              - Jumlah
+                            </label>
+                            <input
+                              type="text"
+                              name="amount"
+                              placeholder="Rp. 100000"
+                              onChange={(e) =>
+                                setCustomDeduction({
+                                  ...customDeduction,
+                                  amount: parseInt(e.target.value),
+                                })
+                              }
+                              className="block ml-2 mt-1 w-full pl-4 pe-3 py-2.5 bg-neutral-secondary-strong border border-border text-heading text-sm rounded focus:ring-brand focus:border-brand placeholder:text-body"
+                            />
+                          </div>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 </Card>
@@ -529,7 +613,6 @@ export default function PayrollPage() {
                 </div>
                 <Card className="w-full border-none">
                   <div className="relative">
-                    {/* Search */}
                     <div className="px-2 pt-2">
                       <label className="sr-only">Search</label>
 
@@ -545,8 +628,6 @@ export default function PayrollPage() {
                         />
                       </div>
                     </div>
-
-                    {/* List */}
                     <ul className="h-fit max-h-40 overflow-y-auto p-2 text-sm text-body font-medium">
                       {allowance.map((item) => (
                         <li
@@ -572,21 +653,71 @@ export default function PayrollPage() {
                           </div>
                         </li>
                       ))}
+                      <li className="hover:bg-background cursor-pointer">
+                        <div
+                          onClick={() =>
+                            setIsAllowanceCustom(!isAllowanceCustom)
+                          }
+                          className="flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isAllowanceCustom}
+                            className="w-4 h-4 border border-default-strong rounded bg-blue-dark focus:ring-2 focus:ring-blue-dark cursor-pointer"
+                          />
+
+                          <label className="w-full ms-2 text-sm font-medium text-heading cursor-pointer">
+                            Custom?
+                          </label>
+                        </div>
+                      </li>
+                      {isAllowanceCustom && (
+                        <li>
+                          <div className="flex flex-col w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md cursor-pointer">
+                            <label
+                              htmlFor="custom-allowance"
+                              className="self-start"
+                            >
+                              - Nama
+                            </label>
+                            <input
+                              type="text"
+                              name="name"
+                              onChange={(e) =>
+                                setCustomAllowance({
+                                  ...customAllowance,
+                                  name: e.target.value,
+                                })
+                              }
+                              placeholder="Exp: Tunjangan Transportasi"
+                              className="block ml-2 mt-1 w-full pl-4 pe-3 py-2.5 bg-neutral-secondary-strong border border-border text-heading text-sm rounded focus:ring-brand focus:border-brand placeholder:text-body"
+                            />
+                          </div>
+                          <div className="flex flex-col w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md cursor-pointer">
+                            <label
+                              htmlFor="custom-allowance"
+                              className="self-start"
+                            >
+                              - Jumlah
+                            </label>
+                            <input
+                              type="text"
+                              name="amount"
+                              placeholder="Rp. 100000"
+                              onChange={(e) =>
+                                setCustomAllowance({
+                                  ...customAllowance,
+                                  amount: parseInt(e.target.value),
+                                })
+                              }
+                              className="block ml-2 mt-1 w-full pl-4 pe-3 py-2.5 bg-neutral-secondary-strong border border-border text-heading text-sm rounded focus:ring-brand focus:border-brand placeholder:text-body"
+                            />
+                          </div>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 </Card>
-                {/* {allowance.map((item) => (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        name="allowance"
-                        id="allowance"
-                        value={item.id}
-                        // onChange={(e) => handleAllowanceChange(e)}
-                      />
-                      <label htmlFor="allowance">{item.allowance_name}</label>
-                    </div>
-                  ))} */}
               </div>
               <div className="flex gap-3 mt-8">
                 <button

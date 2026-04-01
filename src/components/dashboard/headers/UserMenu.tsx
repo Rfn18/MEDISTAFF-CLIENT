@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   ChevronDownIcon,
   InfoIcon,
+  Loader2,
   LogOutIcon,
   SettingsIcon,
   UserCircleIcon,
@@ -16,6 +17,8 @@ export default function UserMenu() {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const userRole = user?.role_id;
   const profileUrl =
@@ -37,12 +40,15 @@ export default function UserMenu() {
 
   const signOut = async () => {
     try {
+      setLoading(true);
       await api.post(`/logout`);
       await logout();
-      navigate("/login");
-      closeDropdown();
     } catch (error) {
       console.error("Error signing out:", error);
+    } finally {
+      setLoading(false);
+      navigate("/login");
+      closeDropdown();
     }
   };
 
@@ -135,10 +141,14 @@ export default function UserMenu() {
             onClick={signOut}
             className="flex items-center gap-3 px-3 py-2.5 mt-2 font-semibold text-red-600 rounded-xl group text-sm hover:bg-red-50/50 hover:cursor-pointer transition-colors"
           >
-            <LogOutIcon
-              className="text-red-400 group-hover:text-red-500 transition-colors"
-              size={18}
-            />
+            {loading ? (
+              <Loader2 className="animate-spin" size={18} />
+            ) : (
+              <LogOutIcon
+                className="text-red-400 group-hover:text-red-500 transition-colors"
+                size={18}
+              />
+            )}
             Keluar
           </div>
         </div>
