@@ -166,8 +166,8 @@ const StaffSchedulePage = () => {
       <div className="w-full flex-col flex gap-8 animate-[slideIn_0.3s_ease-out]">
         {/* Header Title */}
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold text-blue-dark flex items-center gap-3">
-            <CalendarDays className="text-blue-primary" size={28} />
+          <h1 className="text-xl font-bold text-blue-dark flex items-center gap-3">
+            <CalendarDays className="text-blue-primary" size={24} />
             Jadwal Shift
             <span className="opacity-80 font-normal">
               {user?.employee?.department?.department_name || ""}

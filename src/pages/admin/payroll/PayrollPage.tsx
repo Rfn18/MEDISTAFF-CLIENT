@@ -4,10 +4,10 @@ import {
   Calendar,
   CheckCircle2,
   AlertCircle,
+  Info,
   RefreshCw,
   BanknoteX,
   CircleDollarSign,
-  Plus,
   CheckCircle2Icon,
 } from "lucide-react";
 import Layout from "../../../components/layouts/DashboardLayout";
@@ -17,7 +17,11 @@ import { Loading } from "../../../components/ui/load";
 import { toRupiah } from "../../../utils/toRupiah";
 import type { Allowance, Deduction } from "../../../types/payrollType";
 import { Card } from "../../../components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "../../../components/ui/alert";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "../../../components/ui/alert";
 
 const MONTHS = [
   "Januari",
@@ -68,6 +72,8 @@ export default function PayrollPage() {
     name: "",
     amount: 0,
   });
+  const selectedDate = new Date(selectedYear, selectedMonth - 1, 28);
+  const isPayrollSubmissionAllowed = selectedDate <= currentDate;
   const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,6 +81,7 @@ export default function PayrollPage() {
   const [baseSalaryInput, setBaseSalaryInput] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successAlert, setSuccessAlert] = useState<boolean>(false);
+  const [dateAlert, setDateAlert] = useState<boolean>(false);
   const yearOptions = Array.from(
     new Array(5),
     (_, i) => currentDate.getFullYear() - 2 + i,
@@ -122,7 +129,7 @@ export default function PayrollPage() {
       setAllowance(data);
     } catch (error) {
       console.error("Failed to fetch allowance data:", error);
-    } 
+    }
   };
 
   const fetchDeduction = async () => {
@@ -143,6 +150,10 @@ export default function PayrollPage() {
   }, [selectedMonth, selectedYear]);
 
   const handleOpenModal = (emp: Employee) => {
+    if (!isPayrollSubmissionAllowed) {
+      setDateAlert(true);
+      return;
+    }
     setProcessingEmp(emp);
     setBaseSalaryInput("");
     setIsModalOpen(true);
@@ -151,6 +162,10 @@ export default function PayrollPage() {
   const handleProcessPayroll = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!processingEmp) return;
+    if (!isPayrollSubmissionAllowed) {
+      setDateAlert(true);
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -158,19 +173,18 @@ export default function PayrollPage() {
         employee_id: processingEmp.id,
         month: selectedMonth,
         year: selectedYear,
-        allowance: {
-          is_custom: isAllowanceCustom,
-          allowance_id: selectedAllowances,
-          amount: isAllowanceCustom ? customAllowance.amount : null,
-          name: isAllowanceCustom ? customAllowance.name : null,
-        },
-        deduction: {
-          is_custom: isDeductionCustom,
-          deduction_id: selectedDeductions,
-          amount: isDeductionCustom ? customDeduction.amount : null,
-          name: isDeductionCustom ? customDeduction.name : null,
-        },
+        allowance: [
+          {
+            allowance_id: selectedAllowances,
+          },
+        ],
+        deduction: [
+          {
+            deduction_id: selectedDeductions,
+          },
+        ],
       };
+      console.log(payload);
       if (baseSalaryInput.trim() !== "") {
         payload.base_salary = parseInt(baseSalaryInput, 10);
       }
@@ -225,16 +239,17 @@ export default function PayrollPage() {
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
+
   return (
     <Layout>
-     {successAlert && (
-      <Alert className="fixed bottom-0 right-0 m-4 shadow border-none text-success w-80 animate-[slideIn_.6s_ease-in-out]">
-        <CheckCircle2Icon className="text-success" />
-        <AlertTitle>Success!</AlertTitle>
-        <AlertDescription className="text-success/60 text-xs">
-           Karayawan telah digaji
-        </AlertDescription>
-      </Alert>
+      {successAlert && (
+        <Alert className="fixed bottom-0 right-0 m-4 shadow border-none text-success w-80 animate-[slideIn_.6s_ease-in-out]">
+          <CheckCircle2Icon className="text-success" />
+          <AlertTitle>Success!</AlertTitle>
+          <AlertDescription className="text-success/60 text-xs">
+            Karayawan telah digaji
+          </AlertDescription>
+        </Alert>
       )}
       <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto px-2 lg:px-4 text-slate-800 bg-[#F8FAFC] pb-12 animate-[fadeIn_0.3s_ease-out]">
         <div className="mt-4">
@@ -248,6 +263,25 @@ export default function PayrollPage() {
             Pantau status pembayaran gaji dan proses penagihan bulanan.
           </p>
         </div>
+        {!isPayrollSubmissionAllowed && (
+          <Alert className="border-none bg-amber-50 text-amber-700 shadow-sm">
+            <Info className="h-4 w-4 text-amber-600" />
+            <AlertTitle>Periode penggajian belum dibuka</AlertTitle>
+            <AlertDescription className="text-amber-700/80 text-xs">
+              Proses gaji baru bisa dilakukan mulai tanggal 28 sampai akhir
+              bulan. Hari ini tanggal {currentDate.getDate()}.
+            </AlertDescription>
+          </Alert>
+        )}
+        {dateAlert && (
+          <Alert className="border-none bg-destructive/10 text-destructive shadow-sm">
+            <AlertCircle className="h-4 w-4 text-destructive" />
+            <AlertTitle>Belum bisa memproses gaji</AlertTitle>
+            <AlertDescription className="text-destructive/70 text-xs">
+              Fitur proses gaji aktif pada tanggal 28 hingga akhir bulan.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Global Controls */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sticky top-4 z-20 flex flex-col md:flex-row gap-4 items-center justify-between">

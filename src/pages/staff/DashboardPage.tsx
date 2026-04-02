@@ -1,4 +1,11 @@
-import { ChevronLeft, ChevronRight, BarChart2, CalendarDays, Clock, ShieldAlert } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  BarChart2,
+  CalendarDays,
+  Clock,
+  ShieldAlert,
+} from "lucide-react";
 import Layout from "../../components/layouts/DashboardLayout";
 import { useAuth } from "../../context/AuthContext";
 import type { CardItem } from "../../types/card";
@@ -7,9 +14,8 @@ import type { Attendance, AttendanceSummary } from "../../types/attendanceType";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import SelectField from "../../components/ui/selectField";
-import {  AttendanceTableUser } from "../../components/attendance/Attendance";
+import { AttendanceTableUser } from "../../components/attendance/Attendance";
 import { Loading } from "../../components/ui/load";
-
 
 const MONTH_OPTIONS = [
   { id: 1, label: "Januari" },
@@ -43,7 +49,8 @@ const YEAR_OPTIONS = generateYearOptions();
 export default function DashboardPage() {
   const { user } = useAuth();
   const userName = user?.employee?.full_name || user?.name || "Employee";
-  const [attendanceSummaries, setAttendanceSummaries] = useState<AttendanceSummary>(); 
+  const [attendanceSummaries, setAttendanceSummaries] =
+    useState<AttendanceSummary>();
   const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
@@ -83,13 +90,13 @@ export default function DashboardPage() {
     }
   };
   useEffect(() => {
-  if (!user) return;
-  setAttendanceSummaries(undefined);
-  setAttendance([]);
-  setIsAttendacesExist(false);
-  fetchAttendanceSummaries();
-  fetchAttendance();
-}, [month, year]);
+    if (!user) return;
+    setAttendanceSummaries(undefined);
+    setAttendance([]);
+    setIsAttendacesExist(false);
+    fetchAttendanceSummaries();
+    fetchAttendance();
+  }, [month, year]);
 
   const totalLate = Number(attendanceSummaries?.total_late);
   const totalSick = Number(attendanceSummaries?.total_sick);
@@ -122,7 +129,7 @@ export default function DashboardPage() {
       title: "Total Izin",
       amount: totalSick,
       icon: ShieldAlert,
-    }
+    },
   ];
 
   useEffect(() => {
@@ -135,122 +142,135 @@ export default function DashboardPage() {
 
   return (
     <Layout>
-      <div className="flex flex-col gap-8 w-full max-w-7xl mx-auto px-2 lg:px-4 font-sans text-slate-800 bg-[#F8FAFC] pb-12 animate-[fadeIn_0.3s_ease-out]">
+      <div className="flex flex-col gap-4 w-full max-w-7xl mx-auto font-sans text-blue-dark bg-[#F8FAFC] animate-[fadeIn_0.3s_ease-out]">
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Welcome back, {userName}</h1>
+            <h1 className="text-xl  text-blue-dark">
+              Welcome back, <span className="font-bold">{userName}</span>
+            </h1>
             <p className="text-slate-500 mt-1 flex items-center gap-2 font-medium">
-              <CalendarDays size={18} className="text-[#0062FF]" /> {MONTH_OPTIONS[month - 1].label} {year} Recap
+              <CalendarDays size={18} className="text-[#0062FF]" />{" "}
+              {MONTH_OPTIONS[month - 1].label} {year} Recap
             </p>
           </div>
-          
+
           <div className="flex flex-wrap gap-4">
-              <SelectField
-                onChange={(e) => {
-                  setMonth(Number(e.target.value));
-                }}
-                label="Bulan"
-                name="month"
-                options={MONTH_OPTIONS}
-                defaultValue={month}
-              />
-              <SelectField
-                onChange={(e) => {
-                  setYear(Number(e.target.value));
-                }}
-                label="Tahun"
-                name="year"
-                options={YEAR_OPTIONS}
-                defaultValue={year}
-              />
-            </div>
+            <SelectField
+              onChange={(e) => {
+                setMonth(Number(e.target.value));
+              }}
+              label="Bulan"
+              name="month"
+              options={MONTH_OPTIONS}
+              defaultValue={month}
+            />
+            <SelectField
+              onChange={(e) => {
+                setYear(Number(e.target.value));
+              }}
+              label="Tahun"
+              name="year"
+              options={YEAR_OPTIONS}
+              defaultValue={year}
+            />
+          </div>
         </div>
 
-       {isAttendacesExist && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:auto-cols-max lg:grid-cols-4 gap-4 w-full animate-[fadeIn_0.3s_ease-out]">
-          {cardItem.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <Card
-                key={index}
-                className="flex items-center justify-start gap-4 min-w-60 border-none py-6 px-0 pl-10"
-              >
-                <CardHeader className="border-none m-0 p-0">
-                  <div className="p-2 flex items-center justify-center w-12 h-12 rounded bg-primary/10">
-                    <Icon className="text-blue-dark" />
-                  </div>
-                </CardHeader>
-                <CardContent className="border-none m-0 p-0">
-                  <p className="text-blue-dark/60 text-sm">{item.title}</p>
-                  <p className="text-2xl font-bold text-blue-dark">
-                    {item.amount}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+        {isAttendacesExist && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:auto-cols-max lg:grid-cols-4 gap-4 w-full animate-[fadeIn_0.3s_ease-out]">
+            {cardItem.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <Card
+                  key={index}
+                  className="flex items-center justify-start gap-4 min-w-60 border-none py-6 px-0 pl-10"
+                >
+                  <CardHeader className="border-none m-0 p-0">
+                    <div className="p-2 flex items-center justify-center w-12 h-12 rounded bg-primary/10">
+                      <Icon className="text-blue-dark" />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="border-none m-0 p-0">
+                    <p className="text-blue-dark/60 text-sm">{item.title}</p>
+                    <p className="text-2xl font-bold text-blue-dark">
+                      {item.amount}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
         {/* Detailed Log Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
-            <div className="p-4 sm:p-4 border-b border-slate-100 flex justify-between items-center">
-                 <h2 className="text-lg font-bold text-slate-900">Riwayat Absensi</h2>
-                 <button className="text-[#0062FF] text-sm font-semibold hover:underline px-2 py-2 min-h-[44px] outline-none">
-                    Filter by Status
-                 </button>
-            </div>
-            
-            <div className="w-full overflow-x-auto">
-              <CardContent>
-                {isLoading ? (
-                  <div className="flex items-center justify-center w-full py-16">
-                    <Loading message="Memuat absensi..." />
-                  </div>
-                ) : (
-                attendance.length > 0 ? (
-                  <AttendanceTableUser data={attendance} />
-                ) : (
-                  <div className="flex flex-col items-center justify-center w-full py-16">
-                    <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-                      <Clock className="w-8 h-8 text-blue-primary/60" />
-                    </div>
-                    <p className="text-lg font-bold text-blue-dark">
-                      Belum ada data absensi
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Saat ini tidak ada data absensi yang perlu ditinjau.
-                    </p>
-                  </div>
-                ))}
-              </CardContent>
-            </div>
-              
-            
-            {/* Pagination */}
-            <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500 bg-white">
-               <span className="px-2">Showing 1 to 8 of 22 entries</span>
-               <div className="flex gap-2">
-                  <button className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors" aria-label="Previous Page">
-                     <ChevronLeft size={18} />
-                  </button>
-                  <button className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-[#0062FF] text-white font-semibold transition-colors" aria-label="Page 1">
-                     1
-                  </button>
-                  <button className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors" aria-label="Page 2">
-                     2
-                  </button>
-                  <button className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors" aria-label="Page 3">
-                     3
-                  </button>
-                  <button className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors" aria-label="Next Page">
-                     <ChevronRight size={18} />
-                  </button>
-               </div>
-            </div>
+          <div className="p-4 sm:p-4 border-b border-slate-100 flex justify-between items-center">
+            <h2 className="text-lg font-bold text-blue-dark">
+              Riwayat Absensi
+            </h2>
+          </div>
 
+          <div className="w-full overflow-x-auto">
+            <CardContent>
+              {isLoading ? (
+                <div className="flex items-center justify-center w-full py-16">
+                  <Loading message="Memuat absensi..." />
+                </div>
+              ) : attendance.length > 0 ? (
+                <AttendanceTableUser data={attendance} />
+              ) : (
+                <div className="flex flex-col items-center justify-center w-full py-16">
+                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                    <Clock className="w-8 h-8 text-blue-primary/60" />
+                  </div>
+                  <p className="text-lg font-bold text-blue-dark">
+                    Belum ada data absensi
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Saat ini tidak ada data absensi yang perlu ditinjau.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </div>
+
+          {/* Pagination */}
+          <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500 bg-white">
+            <span className="px-2">Showing 1 to 8 of 22 entries</span>
+            <div className="flex gap-2">
+              <button
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors"
+                aria-label="Previous Page"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-[#0062FF] text-white font-semibold transition-colors"
+                aria-label="Page 1"
+              >
+                1
+              </button>
+              <button
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors"
+                aria-label="Page 2"
+              >
+                2
+              </button>
+              <button
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors"
+                aria-label="Page 3"
+              >
+                3
+              </button>
+              <button
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors"
+                aria-label="Next Page"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
         </div>
-
       </div>
     </Layout>
   );

@@ -21,6 +21,7 @@ import ProfilePage from "./pages/shared/ProfilePage";
 import EmployeeProfileAdmin from "./pages/admin/management/EmployeeProfileAdmin";
 import FluxAdminDashboard from "./pages/admin/attendance/FluxAdminDashboard";
 import FluxEmployeeDashboard from "./pages/staff/attendance/FluxEmployeeDashboard";
+import StaffPayrollPage from "./pages/staff/PayrollPage";
 import PayrollPage from "./pages/admin/payroll/PayrollPage";
 import PayrollComponent from "./pages/admin/payroll/PayrollComponent";
 import { useAuth } from "./context/AuthContext";
@@ -94,6 +95,7 @@ function App() {
             path="/staff/flux-attendance"
             element={<FluxEmployeeDashboard />}
           />
+          <Route path="/staff/gaji" element={<StaffPayrollPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
         <Route path="/unauthorized" element={<Unauthorized />} />

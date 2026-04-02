@@ -3,15 +3,18 @@ import type { Department, Employee, Position } from "../../../types/userType";
 import InputField from "../../ui/inputField";
 import axios from "axios";
 import SelectField from "../../ui/selectField";
+import { Loader2 } from "lucide-react";
 
 type EmployeeFormProps = {
   defaultValue?: Employee[];
   onCancel: () => void;
   onSubmit: (data: Employee) => void;
+  loading: boolean;
 };
 
 export default function EmployeeForm({
   defaultValue,
+  loading,
   onCancel,
   onSubmit,
 }: EmployeeFormProps) {
@@ -191,10 +194,13 @@ export default function EmployeeForm({
       )}
 
       <div className="flex gap-2 mt-2">
-        <button className="auth-gradient text-white w-30 px-4 py-2 rounded-md text-sm hover:-translate-y-1 hover:cursor-pointer transition">
-          Simpan
+        <button
+          disabled={loading}
+          className="auth-gradient text-white w-30 px-4 py-2 rounded-md text-sm hover:-translate-y-1 hover:cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? <Loader2 size={18} className="animate-spin" /> : "Simpan"}
         </button>
-
+      
         <button
           type="button"
           onClick={onCancel}

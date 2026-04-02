@@ -87,6 +87,11 @@ const DashboardSidebar = () => {
             icon: <ClockCheck size={20} />,
             href: "/staff/absensi",
           },
+          {
+            name: "Gaji Saya",
+            icon: <DollarSign size={20} />,
+            href: "/staff/gaji",
+          },
         ];
 
   const isActive = (path: string) => location.pathname === path;
