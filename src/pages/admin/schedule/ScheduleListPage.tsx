@@ -13,7 +13,7 @@ import {
 import Layout from "../../../components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader } from "../../../components/ui/card";
 import SelectField from "../../../components/ui/selectField";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import {
   transformSchedule,
@@ -24,7 +24,6 @@ import type { Department } from "../../../types/userType";
 import { Loading } from "../../../components/ui/load";
 
 // Internal components
-import ShiftPalette from "../../../components/schedule/ShiftPalette";
 import DepartmentStatusGrid from "../../../components/schedule/DepartmentStatusGrid";
 import ScheduleGenerator from "../../../components/schedule/ScheduleGenerator";
 import api from "../../../services/api";
@@ -88,7 +87,17 @@ const ScheduleListPage = () => {
   >({});
   const [isOverviewLoading, setIsOverviewLoading] = useState(false);
 
-  // Drag and drop updating state mapping "employeeId-dayIndex" -> bool
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    employeeId: number;
+    dayIndex: number;
+    detailId: number | null;
+  } | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  // Cell updating state mapping "employeeId-dayIndex" -> bool
   const [updatingCells, setUpdatingCells] = useState<Record<string, boolean>>(
     {},
   );
@@ -223,12 +232,12 @@ const ScheduleListPage = () => {
   const filteredSchedule = employeeShift.filter((item: any) => {
     return item.name?.toLowerCase().includes(searchTerm.toLowerCase());
   });
-  
+
   const stats = useMemo(() => {
     const totalEmployees = employeeShift.length;
     let pagi = 0,
-    siang = 0,
-    malam = 0,
+      siang = 0,
+      malam = 0,
       off = 0;
     const todayIndex = today - 1;
 
@@ -285,49 +294,34 @@ const ScheduleListPage = () => {
   )?.department_name;
   const selectedMonthLabel = MONTH_OPTIONS[selectedMonth - 1]?.label || "";
 
-  // Drag and Drop Logic
-  const handleDragOver = (e: React.DragEvent<HTMLTableCellElement>) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "copy";
-  };
-
-  const handleDragEnter = (e: React.DragEvent<HTMLTableCellElement>) => {
-    e.preventDefault();
-    e.currentTarget.classList.add(
-      "bg-blue-soft/40",
-      "scale-[1.05]",
-      "shadow-inner",
-    );
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLTableCellElement>) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove(
-      "bg-blue-soft/40",
-      "scale-[1.05]",
-      "shadow-inner",
-    );
-  };
-
-  const handleDrop = async (
-    e: React.DragEvent<HTMLTableCellElement>,
+  // Context Menu Logic
+  const handleContextMenu = (
+    e: React.MouseEvent<HTMLTableCellElement>,
     employeeId: number,
     dayIndex: number,
     detailId: number | null,
   ) => {
+    if (!detailId) return;
     e.preventDefault();
-    e.currentTarget.classList.remove(
-      "bg-blue-soft/40",
-      "scale-[1.05]",
-      "shadow-inner",
-    );
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      employeeId,
+      dayIndex,
+      detailId,
+    });
+  };
 
-    const shiftCode = e.dataTransfer.getData("shiftCode");
-    if (!shiftCode || !detailId) return;
+  const closeContextMenu = () => setContextMenu(null);
 
+  const handleShiftSelect = async (shiftCode: string) => {
+    if (!contextMenu || !contextMenu.detailId) return;
+
+    const { employeeId, dayIndex, detailId } = contextMenu;
     const shiftData = shiftCodeToId(shiftCode);
     const cellKey = `${employeeId}-${dayIndex}`;
 
+    closeContextMenu();
     setUpdatingCells((prev) => ({ ...prev, [cellKey]: true }));
 
     try {
@@ -336,23 +330,28 @@ const ScheduleListPage = () => {
         is_off: shiftData.is_off ? 1 : 0,
       });
       await fetchSchedule(selectedDepartment);
-
-      e.currentTarget.classList.add("ring-2", "ring-green-400", "ring-inset");
-      setTimeout(
-        () =>
-          e.currentTarget.classList.remove(
-            "ring-2",
-            "ring-green-400",
-            "ring-inset",
-          ),
-        1500,
-      );
     } catch (error) {
       console.error("Gagal update shift detail", error);
     } finally {
       setUpdatingCells((prev) => ({ ...prev, [cellKey]: false }));
     }
   };
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(e.target as Node)
+      ) {
+        closeContextMenu();
+      }
+    };
+    if (contextMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [contextMenu]);
 
   return (
     <Layout>
@@ -516,17 +515,55 @@ const ScheduleListPage = () => {
           {/* TAB 1: JADWAL SHIFT */}
           {activeTab === "jadwal" && (
             <div className="flex flex-col xl:flex-row items-start gap-6 animate-[slideIn_0.3s_ease-out]">
-              {/* Left Column: Palette */}
+              {/* Left Column: Legend & Hint */}
               {filteredSchedule.length > 0 && !isLoading && (
                 <div className="w-full xl:w-[200px] shrink-0 sticky top-24 z-20">
-                  <ShiftPalette />
-                  <div className="mt-4 p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
+                  <div className="p-4 bg-card border border-border rounded-xl shadow-sm">
+                    <h4 className="text-sm font-semibold text-blue-dark mb-3">
+                      Petunjuk
+                    </h4>
+                    <div className="flex flex-col gap-2">
+                      {[
+                        {
+                          code: "P",
+                          label: "Pagi",
+                          color: "bg-green-500/60 text-green-800",
+                        },
+                        {
+                          code: "S",
+                          label: "Siang",
+                          color: "bg-yellow-500/60 text-yellow-800",
+                        },
+                        {
+                          code: "M",
+                          label: "Malam",
+                          color: "bg-blue-500/60 text-blue-800",
+                        },
+                        {
+                          code: "O",
+                          label: "Off / Libur",
+                          color: "bg-red-500/60 text-red-800",
+                        },
+                      ].map((s) => (
+                        <div key={s.code} className="flex items-center gap-2">
+                          <span
+                            className={`w-8 h-6 flex items-center justify-center rounded-md text-xs font-bold ${s.color}`}
+                          >
+                            {s.code}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {s.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-3 p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
                     <h4 className="text-sm font-semibold text-blue-dark mb-1">
                       Cara Edit
                     </h4>
                     <p className="text-xs text-muted-foreground">
-                      Tarik (drag) blok shift dari atas lalu lepas (drop) pada
-                      sel jadwal untuk mengubah shift karyawan.
+                      Klik kanan pada sel jadwal untuk mengganti shift karyawan.
                     </p>
                   </div>
                 </div>
@@ -642,11 +679,8 @@ const ScheduleListPage = () => {
                                 return (
                                   <td
                                     key={day}
-                                    onDragOver={handleDragOver}
-                                    onDragEnter={handleDragEnter}
-                                    onDragLeave={handleDragLeave}
-                                    onDrop={(e) =>
-                                      handleDrop(
+                                    onContextMenu={(e) =>
+                                      handleContextMenu(
                                         e,
                                         employee.employee_id,
                                         day,
@@ -659,9 +693,9 @@ const ScheduleListPage = () => {
                                     transition-all duration-200 select-none
                                     ${isToday ? "ring-2 ring-inset ring-blue-primary/40" : ""}
                                     ${isUpdating ? "animate-pulse opacity-50 bg-slate-100" : ""}
-                                    ${!isUpdating && detailId ? "cursor-alias hover:brightness-95 hover:shadow-inner" : "cursor-not-allowed opacity-50"}
+                                    ${!isUpdating && detailId ? "cursor-context-menu hover:brightness-95 hover:shadow-inner" : "cursor-not-allowed opacity-50"}
                                   `}
-                                    title={`${employee.name} — Hari ke-${day + 1}${detailId ? "" : " (No Detail ID)"}`}
+                                    title={`${employee.name} — Hari ke-${day + 1}${detailId ? " (Klik kanan untuk edit)" : " (No Detail ID)"}`}
                                   >
                                     {isUpdating ? (
                                       <Loader2
@@ -750,6 +784,65 @@ const ScheduleListPage = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <div
+          ref={contextMenuRef}
+          style={{
+            position: "fixed",
+            top: contextMenu.y,
+            left: contextMenu.x,
+            zIndex: 9999,
+          }}
+          className="bg-white border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px] animate-[fadeIn_0.15s_ease-out]"
+        >
+          <div className="px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-slate-50">
+            Ganti Shift
+          </div>
+          {[
+            {
+              code: "P",
+              label: "Shift Pagi",
+              color: "text-green-700",
+              bg: "hover:bg-green-50",
+              dot: "bg-green-500",
+            },
+            {
+              code: "S",
+              label: "Shift Siang",
+              color: "text-yellow-700",
+              bg: "hover:bg-yellow-50",
+              dot: "bg-yellow-500",
+            },
+            {
+              code: "M",
+              label: "Shift Malam",
+              color: "text-blue-700",
+              bg: "hover:bg-blue-50",
+              dot: "bg-blue-500",
+            },
+            {
+              code: "O",
+              label: "Off / Libur",
+              color: "text-red-600",
+              bg: "hover:bg-red-50",
+              dot: "bg-red-500",
+            },
+          ].map((option) => (
+            <button
+              key={option.code}
+              onClick={() => handleShiftSelect(option.code)}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${option.color} ${option.bg} cursor-pointer`}
+            >
+              <span
+                className={`w-2.5 h-2.5 rounded-full ${option.dot} shrink-0`}
+              />
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
     </Layout>
   );
 };
