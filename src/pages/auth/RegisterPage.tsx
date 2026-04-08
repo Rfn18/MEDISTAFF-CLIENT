@@ -120,7 +120,7 @@ export const Register = () => {
           <div className="flex items-center bg-background w-full h-12 mb-2 border border-[#ddd] rounded-xl">
             <IdCard size="20" className="m-3 opacity-70" />
             <input
-              type="number"
+              type="text"
               name="nip"
               placeholder="Enter Your NIP"
               className="w-full h-full text-sm outline-none"

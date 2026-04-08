@@ -83,6 +83,7 @@ function App() {
             path="/admin/karyawan/:id"
             element={<EmployeeProfileAdmin />}
           />
+          <Route path="/admin/flux-dashboard" element={<FluxAdminDashboard />} />
           {/* Schedule */}
           <Route path="/admin/jadwal-shift" element={<ScheduleListPage />} />
           <Route path="/admin/request-shift" element={<RequestSchedule />} />
