@@ -233,43 +233,6 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </div>
-
-          {/* Pagination */}
-          <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500 bg-white">
-            <span className="px-2">Showing 1 to 8 of 22 entries</span>
-            <div className="flex gap-2">
-              <button
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors"
-                aria-label="Previous Page"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <button
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-[#0062FF] text-white font-semibold transition-colors"
-                aria-label="Page 1"
-              >
-                1
-              </button>
-              <button
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors"
-                aria-label="Page 2"
-              >
-                2
-              </button>
-              <button
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors"
-                aria-label="Page 3"
-              >
-                3
-              </button>
-              <button
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 hover:border-[#0062FF] hover:text-[#0062FF] bg-white transition-colors"
-                aria-label="Next Page"
-              >
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </Layout>

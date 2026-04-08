@@ -46,4 +46,37 @@ export type QrToken = {
   longitude: number;
   latitude: number;
   user_id: number;
+};
+
+export interface LocationRecord {
+  id: number;
+  rs_name: string;
+  latitude: number;
+  longitude: number;
+  radius_meters: number;
+  created_at?: string;
+  updated_at?: string;
 }
+
+export interface FormState {
+  rs_name: string;
+  latitude: string;
+  longitude: string;
+  radius_meters: string;
+}
+
+export interface FieldError {
+  rs_name?: string;
+  latitude?: string;
+  longitude?: string;
+  radius_meters?: string;
+}
+
+export type ToastType = "success" | "error";
+
+export const emptyForm: FormState = {
+  rs_name: "",
+  latitude: "",
+  longitude: "",
+  radius_meters: "",
+};

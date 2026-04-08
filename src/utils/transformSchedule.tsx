@@ -12,44 +12,46 @@ export const transformSchedule = (
   days: number,
 ): TransformedEmployee[] => {
   const result: Record<number, TransformedEmployee> = {};
-  if (!data || !employees) {
-    return [];
-  }
+  if (!data || !employees) return [];
 
-  data.forEach((item, index) => {
+  const employeeMap = new Map(employees.map((emp) => [emp.id, emp.full_name]));
+
+  data.forEach((item) => {
     const employeeId = item.employee_id;
-    const filteredName = employees.find(
-      (employee) => employee.id === employeeId,
-    )?.full_name;
-
-    console.log(employeeId);
 
     if (!result[employeeId]) {
       result[employeeId] = {
         employee_id: employeeId,
-        name: filteredName ?? "Unknown",
+        name: employeeMap.get(employeeId) ?? "Unknown",
         shifts: Array(days).fill(""),
         detailIds: Array(days).fill(null),
         shiftIds: Array(days).fill(null),
       };
     }
 
-    const dayIndex = index % days;
+    const dateString = item.schedule_date || item.start_date;
 
-    result[employeeId].detailIds[dayIndex] = item.id ?? null;
-    result[employeeId].shiftIds[dayIndex] = item.shift_id ?? null;
+    if (dateString) {
+      const day = new Date(dateString).getDate();
+      const dayIndex = day - 1;
 
-    if (item.is_off) {
-      result[employeeId].shifts[dayIndex] = "O";
-    } else {
-      result[employeeId].shifts[dayIndex] =
-        item.shift_id === 1
-          ? "P"
-          : item.shift_id === 2
-            ? "S"
-            : item.shift_id === 3
-              ? "M"
-              : "";
+      if (dayIndex >= 0 && dayIndex < days) {
+        result[employeeId].detailIds[dayIndex] = item.id ?? null;
+        result[employeeId].shiftIds[dayIndex] = item.shift_id ?? null;
+
+        if (item.is_off) {
+          result[employeeId].shifts[dayIndex] = "O";
+        } else {
+          result[employeeId].shifts[dayIndex] =
+            item.shift_id === 1
+              ? "P"
+              : item.shift_id === 2
+                ? "S"
+                : item.shift_id === 3
+                  ? "M"
+                  : "";
+        }
+      }
     }
   });
 

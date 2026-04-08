@@ -52,6 +52,7 @@ const DashboardSidebar = () => {
             subItems: [
               { name: "List Absensi", href: "/admin/absensi" },
               { name: "Scan Absensi", href: "/admin/scan-absensi" },
+              { name: "Lokasi Kantor", href: "/admin/lokasi-kantor" },
             ],
           },
           {

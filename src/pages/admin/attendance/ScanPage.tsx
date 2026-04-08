@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import Layout from "../../../components/layouts/DashboardLayout";
 import { Html5Qrcode } from "html5-qrcode";
-import { CheckCircle2Icon, SwitchCamera } from "lucide-react";
+import { Building2, CheckCircle2Icon, SwitchCamera } from "lucide-react";
 import api from "../../../services/api";
 import { Loading } from "../../../components/ui/load";
 import type { User } from "../../../types/userType";
-import type { QrToken } from "../../../types/attendanceType";
+import type { LocationRecord, QrToken } from "../../../types/attendanceType";
 import {
   Alert,
   AlertDescription,
   AlertTitle,
 } from "../../../components/ui/alert";
+import { Card } from "../../../components/ui/card";
 
 const ScanPage = () => {
   const [scanner, setScanner] = useState<Html5Qrcode | null>(null);
@@ -24,6 +25,8 @@ const ScanPage = () => {
     time: string;
   }>({ name: "", time: "" });
   const [isCheckIn, setIsCheckIn] = useState<boolean>(true);
+  const [locations, setLocations] = useState<LocationRecord[]>([]);
+  const [loadingList, setLoadingList] = useState<boolean>(false);
 
   const time = new Date().toISOString();
 
@@ -40,22 +43,44 @@ const ScanPage = () => {
     }
   };
 
-  useEffect(() => {
-    const html5qrcode = new Html5Qrcode("reader");
-    fetchEmployee();
-    setScanner(html5qrcode);
+  const fetchLocations = async () => {
+    setLoadingList(true);
+    try {
+      const res = await api.get("/attendance-settings");
+      const raw =
+        res?.data?.data?.datas?.data ??
+        res?.data?.data?.datas ??
+        res?.data?.data ??
+        res?.data ??
+        [];
+      setLocations(Array.isArray(raw) ? raw : [raw]);
+    } catch {
+      setLocations([]);
+    } finally {
+      setLoadingList(false);
+    }
+  };
 
-    return () => {
-      if (html5qrcode.isScanning) {
-        html5qrcode.stop();
-      }
-    };
+  useEffect(() => {
+    fetchLocations();
   }, []);
 
-  const switchCamera = () => {
-    setCameraMode((prev) => (prev === "environment" ? "user" : "environment"));
-    scanner?.stop().then(() => startScan());
-  };
+  const hasLoation = locations.length > 0;
+
+  useEffect(() => {
+    const element = document.getElementById("reader");
+    if (element) {
+      const html5qrcode = new Html5Qrcode("reader");
+      fetchEmployee();
+      setScanner(html5qrcode);
+
+      return () => {
+        if (html5qrcode.isScanning) {
+          html5qrcode.stop().catch((err) => console.error("Stop failed", err));
+        }
+      };
+    }
+  }, [hasLoation]);
 
   const startScan = async () => {
     if (!scanner) return;
@@ -116,6 +141,26 @@ const ScanPage = () => {
     }
   }, [successAlert]);
 
+  if (!hasLoation) {
+    return (
+      <Layout>
+        <Card className="border-none mt-4">
+          <div className="flex flex-col items-center justify-center p-16 text-center animate-[fadeIn_0.3s_ease-out]">
+            <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 text-slate-300">
+              <Building2 size={32} className="text-blue-dark/60" />
+            </div>
+            <h3 className="text-lg font-bold text-blue-dark">
+              Belum ada lokasi rumah sakit
+            </h3>
+            <p className="text-blue-dark/60 mt-1 max-w-sm text-sm">
+              Silahkan tambahkan lokasi rumah sakit terlebih dahulu
+            </p>
+          </div>
+        </Card>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       {successAlert && (
@@ -141,8 +186,6 @@ const ScanPage = () => {
         </h2>
 
         <div className="relative w-full max-w-md aspect-square bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
-          <div id="reader" className="w-full h-full"></div>
-
           {!isScanning && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/60">
               <button

@@ -23,7 +23,6 @@ export default function ScheduleGenerator({
   onSuccess,
 }: ScheduleGeneratorProps) {
   const { user } = useAuth();
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const [departmentId, setDepartmentId] = useState<number | string>(
     departments[0]?.id || "",
@@ -34,8 +33,6 @@ export default function ScheduleGenerator({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-
-  console.log(user);
 
   const handleGenerate = async () => {
     if (!departmentId) {

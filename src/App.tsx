@@ -16,6 +16,7 @@ import Unauthorized from "./pages/Unauthorized";
 import AttendancePage from "./pages/admin/attendance/AttendancePage";
 import QRCodePage from "./pages/staff/attendance/QRCodePage";
 import ScanPage from "./pages/admin/attendance/ScanPage";
+import AttendanceSettingsPage from "./pages/admin/attendance/AttendanceSettingsPage";
 import StaffSchedulePage from "./pages/staff/schedule/StaffSchedulePage";
 import ProfilePage from "./pages/shared/ProfilePage";
 import EmployeeProfileAdmin from "./pages/admin/management/EmployeeProfileAdmin";
@@ -27,23 +28,41 @@ import PayrollComponent from "./pages/admin/payroll/PayrollComponent";
 import { useAuth } from "./context/AuthContext";
 
 function App() {
-  const {user} = useAuth();
+  const { user } = useAuth();
   return (
     <BrowserRouter>
       <Routes>
-       {user ? (
+        {user ? (
           <>
             {user.role_id === 2 ? (
               <>
-                <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
-                <Route path="/login" element={<Navigate to="/admin/dashboard" replace />} />
-                <Route path="/register" element={<Navigate to="/admin/dashboard" replace />} />
+                <Route
+                  path="/"
+                  element={<Navigate to="/admin/dashboard" replace />}
+                />
+                <Route
+                  path="/login"
+                  element={<Navigate to="/admin/dashboard" replace />}
+                />
+                <Route
+                  path="/register"
+                  element={<Navigate to="/admin/dashboard" replace />}
+                />
               </>
             ) : (
               <>
-                <Route path="/" element={<Navigate to="/staff/dashboard" replace />} />
-                <Route path="/login" element={<Navigate to="/staff/dashboard" replace />} />
-                <Route path="/register" element={<Navigate to="/staff/dashboard" replace />} />
+                <Route
+                  path="/"
+                  element={<Navigate to="/staff/dashboard" replace />}
+                />
+                <Route
+                  path="/login"
+                  element={<Navigate to="/staff/dashboard" replace />}
+                />
+                <Route
+                  path="/register"
+                  element={<Navigate to="/staff/dashboard" replace />}
+                />
               </>
             )}
           </>
@@ -75,8 +94,8 @@ function App() {
           <Route path="/admin/absensi" element={<AttendancePage />} />
           <Route path="/admin/scan-absensi" element={<ScanPage />} />
           <Route
-            path="/admin/flux-attendance"
-            element={<FluxAdminDashboard />}
+            path="/admin/lokasi-kantor"
+            element={<AttendanceSettingsPage />}
           />
 
           {/* Payroll */}
