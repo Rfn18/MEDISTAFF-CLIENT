@@ -17,11 +17,9 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
-import type { Attendance } from "../../types/attendanceType";
+import type { Attendance, StatusFilter } from "../../types/attendanceType";
 import type { Department, Employee } from "../../types/userType";
 import formatTime from "../../utils/formatTime";
-
-type StatusFilter = "all" | "present" | "late" | "checked-in";
 
 export default function AttendanceDashboard() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -71,8 +69,6 @@ export default function AttendanceDashboard() {
     fetchAttendanceToday();
   }, []);
 
-
-  console.log(departments)
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchAttendanceToday();
@@ -182,6 +178,10 @@ export default function AttendanceDashboard() {
     setSearchQuery("");
   };
 
+  const handleChangeStatus = (e) => {
+    setStatusFilter(e.target.value);
+  }
+
   // Status badge
   const StatusBadge = ({ status }: { status: string }) => {
     const config: Record<string, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
@@ -217,6 +217,7 @@ export default function AttendanceDashboard() {
       </span>
     );
   };
+  
 
   // Loading skeleton
   if (loading) {
@@ -301,6 +302,12 @@ export default function AttendanceDashboard() {
               {dept.department_name}
             </option>
           ))}
+        </select>
+        <select value={statusFilter} onChange={handleChangeStatus} name="status" id="status" className="text-sm border-border border rounded-md p-2 focus:outline-none">
+          <option value="all">Semua Status</option>
+          <option value="present">Hadir</option>
+          <option value="late">Terlambat</option>
+          <option value="checked-in">Check-In</option>
         </select>
         </div>
       </div>

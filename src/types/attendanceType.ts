@@ -1,6 +1,8 @@
 import type { ShiftType } from "../components/schedule/ShiftPalette";
 import type { Employee } from "./userType";
 
+export type StatusFilter = "all" | "present" | "late" | "checked-in";
+
 export interface Attendance {
   id: number;
   employee_id: number;
