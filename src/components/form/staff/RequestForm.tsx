@@ -15,14 +15,14 @@ export default function RequestForm({
   onCancel,
   onSubmit,
 }: RequestFormProps) {
-  const url = import.meta.env.VITE_API_BASE_URL;
   const [leaveType, setLeaveType] = useState([]);
 
   useEffect(() => {
     const fetchLeaveType = async () => {
-      const response = await api.get(`${url}/api/leave-types`);
+      const response = await api.get(`/leave-types`);
       const data = response?.data.data.datas.data;
       setLeaveType(data);
+      console.log(data);
     };
     fetchLeaveType();
   }, []);

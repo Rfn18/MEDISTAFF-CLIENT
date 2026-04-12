@@ -1,25 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Search,
-  Filter,
   Clock,
   CheckCircle2,
   AlertTriangle,
   LogIn,
   Users,
   CalendarDays,
-  ChevronDown,
   X,
   RefreshCw,
   UserCheck,
   Timer,
-  ArrowDownUp,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 import type { Attendance, StatusFilter } from "../../types/attendanceType";
 import type { Department, Employee } from "../../types/userType";
 import formatTime from "../../utils/formatTime";
+import { TableSkeleton } from "../ui/skeletonLoad";
 
 export default function AttendanceDashboard() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -64,8 +62,7 @@ export default function AttendanceDashboard() {
   };
 
   useEffect(() => {
-
-    fetchAttendanceComponents()
+    fetchAttendanceComponents();
     fetchAttendanceToday();
   }, []);
 
@@ -132,19 +129,16 @@ export default function AttendanceDashboard() {
   // Filtered data
   const filteredAttendances = useMemo(() => {
     return attendances.filter((att) => {
-      // Department filter
       if (selectedDepartment !== "all") {
         const deptName = getDepartmentName(att);
         if (deptName !== selectedDepartment) return false;
       }
 
-      // Status filter
       if (statusFilter !== "all") {
         const status = resolveStatus(att);
         if (status !== statusFilter) return false;
       }
 
-      // Search filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const name = getEmployeeName(att).toLowerCase();
@@ -172,19 +166,16 @@ export default function AttendanceDashboard() {
     year: "numeric",
   });
 
-  const clearAllFilters = () => {
-    setSelectedDepartment("all");
-    setStatusFilter("all");
-    setSearchQuery("");
-  };
-
   const handleChangeStatus = (e) => {
     setStatusFilter(e.target.value);
-  }
+  };
 
   // Status badge
   const StatusBadge = ({ status }: { status: string }) => {
-    const config: Record<string, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
+    const config: Record<
+      string,
+      { bg: string; text: string; icon: React.ReactNode; label: string }
+    > = {
       present: {
         bg: "bg-emerald-50 border-emerald-200",
         text: "text-emerald-700",
@@ -205,7 +196,12 @@ export default function AttendanceDashboard() {
       },
     };
 
-    const resolved = status === "present" ? "present" : status === "late" ? "late" : "checked-in";
+    const resolved =
+      status === "present"
+        ? "present"
+        : status === "late"
+          ? "late"
+          : "checked-in";
     const c = config[resolved];
 
     return (
@@ -217,29 +213,10 @@ export default function AttendanceDashboard() {
       </span>
     );
   };
-  
 
   // Loading skeleton
   if (loading) {
-    return (
-      <div className="space-y-6 animate-in fade-in duration-300">
-        {/* Table skeleton */}
-        <div className="bg-white rounded-xl border border-border p-6 animate-pulse">
-          <div className="h-5 bg-primary/10 rounded w-48 mb-6" />
-          <div className="space-y-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-primary/10 rounded-full" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3 bg-primary/10 rounded w-3/4" />
-                  <div className="h-2 bg-primary/10 rounded w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <TableSkeleton rows={5} />;
   }
 
   return (
@@ -295,20 +272,26 @@ export default function AttendanceDashboard() {
           </div>
 
           {/* Department Filter */}
-        <select className="text-sm border-border border rounded-md p-2 focus:outline-none">
-          <option value="all">Semua Departemen</option>
-          {departments.map((dept) => (
-            <option key={dept.id} value={dept.department_name}>
-              {dept.department_name}
-            </option>
-          ))}
-        </select>
-        <select value={statusFilter} onChange={handleChangeStatus} name="status" id="status" className="text-sm border-border border rounded-md p-2 focus:outline-none">
-          <option value="all">Semua Status</option>
-          <option value="present">Hadir</option>
-          <option value="late">Terlambat</option>
-          <option value="checked-in">Check-In</option>
-        </select>
+          <select className="text-sm border-border border rounded-md p-2 focus:outline-none">
+            <option value="all">Semua Departemen</option>
+            {departments.map((dept) => (
+              <option key={dept.id} value={dept.department_name}>
+                {dept.department_name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={statusFilter}
+            onChange={handleChangeStatus}
+            name="status"
+            id="status"
+            className="text-sm border-border border rounded-md p-2 focus:outline-none"
+          >
+            <option value="all">Semua Status</option>
+            <option value="present">Hadir</option>
+            <option value="late">Terlambat</option>
+            <option value="checked-in">Check-In</option>
+          </select>
         </div>
       </div>
 
@@ -318,9 +301,7 @@ export default function AttendanceDashboard() {
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
           <div className="flex items-center gap-2">
             <UserCheck size={18} className="text-blue-primary" />
-            <h3 className="font-semibold text-blue-dark">
-              Daftar Kehadiran
-            </h3>
+            <h3 className="font-semibold text-blue-dark">Daftar Kehadiran</h3>
             <span className="ml-1 px-2 py-0.5 text-xs font-medium text-blue-primary bg-blue-primary/10 rounded-full">
               {filteredAttendances.length} karyawan
             </span>
@@ -416,7 +397,7 @@ export default function AttendanceDashboard() {
                           ) : (
                             <img
                               src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                name || "User"
+                                name || "User",
                               )}&background=cce3de&color=03045e&size=36`}
                               alt={name}
                               className="w-9 h-9 rounded-full ring-2 ring-border"
@@ -451,14 +432,14 @@ export default function AttendanceDashboard() {
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-sm text-blue-dark/70">
-                          {att.check_out_time
-                            ? formatTime(att.check_out_time)
-                            : (
-                              <span className="inline-flex items-center gap-1 text-xs text-blue-dark/30">
-                                <Timer size={11} />
-                                Belum
-                              </span>
-                            )}
+                          {att.check_out_time ? (
+                            formatTime(att.check_out_time)
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-xs text-blue-dark/30">
+                              <Timer size={11} />
+                              Belum
+                            </span>
+                          )}
                         </span>
                       </td>
                       <td className="px-6 py-4">
@@ -494,8 +475,8 @@ export default function AttendanceDashboard() {
         {filteredAttendances.length > 0 && (
           <div className="flex items-center justify-between px-6 py-3 bg-background/40 border-t border-border/50">
             <p className="text-xs text-blue-dark/40">
-              Menampilkan {filteredAttendances.length} dari{" "}
-              {attendances.length} data kehadiran
+              Menampilkan {filteredAttendances.length} dari {attendances.length}{" "}
+              data kehadiran
             </p>
             <p className="text-xs text-blue-dark/40">
               Terakhir diperbarui:{" "}

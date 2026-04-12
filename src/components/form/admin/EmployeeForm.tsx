@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import type { Department, Employee, Position } from "../../../types/userType";
 import InputField from "../../ui/inputField";
-import axios from "axios";
 import SelectField from "../../ui/selectField";
 import { Loader2 } from "lucide-react";
+import api from "../../../services/api";
 
 type EmployeeFormProps = {
   defaultValue?: Employee[];
@@ -18,14 +18,13 @@ export default function EmployeeForm({
   onCancel,
   onSubmit,
 }: EmployeeFormProps) {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const [position, setPosition] = useState<Position[]>([]);
   const [department, setDepartment] = useState<Department[]>([]);
 
   const fetchPosition = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/positions`);
+      const response = await api.get(`/positions`);
       const data = response.data.data.datas.data;
       setPosition(data);
     } catch (error) {
@@ -35,7 +34,7 @@ export default function EmployeeForm({
 
   const fetchDepartment = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/departments`);
+      const response = await api.get(`/departments`);
       const data = response.data.data.datas.data;
       setDepartment(data);
     } catch (error) {

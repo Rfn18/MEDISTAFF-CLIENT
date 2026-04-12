@@ -1,5 +1,6 @@
 import type { Position } from "../../../types/userType";
 import InputField from "../../ui/inputField";
+import SelectField from "../../ui/selectField";
 
 type PositionTableProps = {
   defaultValue?: Position[];
@@ -22,6 +23,7 @@ export default function PositionForm({
       position_name: formData.get("position_name") as string,
       description: formData.get("description") as string,
       base_salary: Number(formData.get("base_salary")),
+      category: formData.get("category") as string,
     };
 
     onSubmit(data);
@@ -46,6 +48,16 @@ export default function PositionForm({
         name="base_salary"
         placeholder="exp: 1000000"
         defaultValue={defaultValue?.[0]?.base_salary}
+      />
+
+      <SelectField
+        label="Category"
+        name="category"
+        options={[
+          { id: "medis", label: "Medis" },
+          { id: "non-medis", label: "Non Medis" },
+        ]}
+        defaultValue={defaultValue?.[0]?.category}
       />
 
       <div className="flex gap-2 mt-2">

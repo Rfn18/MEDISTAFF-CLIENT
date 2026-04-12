@@ -166,6 +166,10 @@ export function PositionTable({
       render: (row: Position) => toRupiah(row.base_salary),
     },
     {
+      header: "Category",
+      render: (row: Position) => row.category,
+    },
+    {
       header: "Aksi",
       render: (row: Position) => (
         <>

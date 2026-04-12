@@ -1,11 +1,5 @@
 import DataTable from "../ui/dataTable";
-import type {
-  Department,
-  Employee,
-  Position,
-  Role,
-  User,
-} from "../../types/userType";
+import type { Employee } from "../../types/userType";
 import { Link } from "react-router-dom";
 type Column<T> = {
   header: string;
@@ -56,11 +50,15 @@ export function EmployeeTableDashboard({
     },
     {
       header: "Present",
-      render: (row: Employee) => <p className="text-center text-green-500">0</p>,
+      render: (row: Employee) => (
+        <p className="text-center text-green-500">0</p>
+      ),
     },
     {
       header: "Late",
-      render: (row: Employee) => <p className="text-center text-yellow-500">0</p>,
+      render: (row: Employee) => (
+        <p className="text-center text-yellow-500">0</p>
+      ),
     },
     {
       header: "Sick/Leave",
@@ -74,7 +72,7 @@ export function EmployeeTableDashboard({
       header: "Aksi",
       render: (row: Employee) => (
         <button className="bg-blue-primary text-white px-2 py-2 rounded-lg hover:bg-blue-primary/80 transition-colors cursor-pointer">
-         Lihat Details
+          Lihat Details
         </button>
       ),
     },

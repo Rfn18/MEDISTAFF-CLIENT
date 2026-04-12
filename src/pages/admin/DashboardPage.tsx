@@ -1,18 +1,18 @@
-import {
-  HardHat,
-  Loader2,
-  PenBox,
-  Stethoscope,
-  Users,
-} from "lucide-react";
+import { HardHat, Loader2, PenBox, Stethoscope, Users } from "lucide-react";
 import Layout from "../../components/layouts/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import type { CardItem } from "../../types/card";
 import { useEffect, useState } from "react";
 import type { Employee, LeaveRequest, Department } from "../../types/userType";
 import api from "../../services/api";
 import AttendanceDashboard from "../../components/dashboard/AttendanceDashboard";
 import { EmployeeTableDashboard } from "../../components/dashboard/dashboardTable";
+import { CardSkeleton, TableSkeleton } from "../../components/ui/skeletonLoad";
 
 const Dashboard = () => {
   const [employee, setEmployee] = useState<Employee[]>([]);
@@ -46,7 +46,9 @@ const Dashboard = () => {
       setLeaveRequest(dataLeaveRequest);
 
       // schedule-today
-      const responseScheduleToday = await api.get(`/shift-schedule-details/today`);
+      const responseScheduleToday = await api.get(
+        `/shift-schedule-details/today`,
+      );
       const dataScheduleToday = responseScheduleToday.data.data.datas.data;
       setScheduleToday(dataScheduleToday);
     } catch (error) {
@@ -100,22 +102,7 @@ const Dashboard = () => {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {loading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <Card
-              key={i}
-              className="flex bg-default border-border items-center gap-4 p-6 animate-pulse"
-            >
-              <CardHeader className="p-0">
-                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10">
-                  <div className="text-blue-dark"></div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0 w-full">
-                <div className="h-2.5 bg-primary/10 rounded-full w-full mb-2.5 mx-auto"></div>
-                <div className="h-2.5 bg-primary/10 rounded-full w-full mb-2.5 mx-auto"></div>
-              </CardContent>
-            </Card>
-          ))
+          <CardSkeleton rows={4} />
         ) : (
           cardItem.map((item) => {
             const Icon = item.icon;
@@ -141,26 +128,32 @@ const Dashboard = () => {
         )}
       </div>
 
-    {/* Attendance Dashboard */}
-    <div className="mt-6">
-      <Card className="border-none">
-        <CardHeader >
-          <CardTitle className="text-xl font-semibold">Attendance Dashboard</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AttendanceDashboard />
-        </CardContent>
-      </Card>
-    </div>
+      {/* Attendance Dashboard */}
+      <div className="mt-6">
+        <Card className="border-none">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              Attendance Dashboard
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AttendanceDashboard />
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Attendance log for 1 month*/}
       <div className="mt-6">
         <Card className="border-none">
-          <CardHeader >
+          <CardHeader>
             <CardTitle className="text-xl">Attendance Log</CardTitle>
           </CardHeader>
           <CardContent>
-            <EmployeeTableDashboard data={employee} />
+            {loading ? (
+              <TableSkeleton rows={5} />
+            ) : (
+              <EmployeeTableDashboard data={employee} />
+            )}
           </CardContent>
         </Card>
       </div>

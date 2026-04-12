@@ -72,6 +72,7 @@ export type Position = {
   position_name: string;
   description: string;
   base_salary: number;
+  category: string;
 };
 
 export type Department = {

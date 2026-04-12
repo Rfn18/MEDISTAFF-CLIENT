@@ -63,7 +63,7 @@ const LeaveRequestPage = () => {
   const handleAddLeave = async (data: LeaveRequest) => {
     setLeaveForm(data);
     try {
-      await api.post(`${baseUrl}/api/leave-requests`, data);
+      await api.post(`/leave-requests`, data);
       fetchLeaveData();
     } catch (error) {
       console.error("Error adding leave request:", error);

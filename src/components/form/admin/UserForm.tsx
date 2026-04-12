@@ -3,6 +3,7 @@ import type { Employee, Role, User } from "../../../types/userType";
 import InputField from "../../ui/inputField";
 import axios from "axios";
 import SelectField from "../../ui/selectField";
+import api from "../../../services/api";
 
 type UserFormProps = {
   defaultValue?: User[];
@@ -15,14 +16,12 @@ export default function UserForm({
   onCancel,
   onSubmit,
 }: UserFormProps) {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
   const [employee, setEmployee] = useState<Employee[]>([]);
   const [role, setRole] = useState<Role[]>([]);
 
   const fetchEmployee = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/employees`);
+      const response = await api.get(`/employees`);
       const data = response.data.data.datas.data;
       setEmployee(data);
     } catch (error) {
@@ -32,7 +31,7 @@ export default function UserForm({
 
   const fetchRole = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/roles`);
+      const response = await api.get(`/roles`);
       const data = response.data.data.datas.data;
       setRole(data);
     } catch (error) {

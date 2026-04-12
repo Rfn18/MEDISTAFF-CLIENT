@@ -60,7 +60,6 @@ const YEAR_OPTIONS = generateYearOptions();
 type TabType = "jadwal" | "status" | "buat";
 
 const ScheduleListPage = () => {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const [activeTab, setActiveTab] = useState<TabType>("jadwal");
 
@@ -105,7 +104,7 @@ const ScheduleListPage = () => {
   // Fetch initial data
   const fetchDepartment = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/departments`);
+      const response = await api.get(`/departments`);
       const data = response.data.data.datas.data;
       setDepartmentData(data);
       if (data.length > 0 && !selectedDepartment) {
@@ -118,7 +117,7 @@ const ScheduleListPage = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/employees`);
+      const response = await api.get(`/employees`);
       const data = response.data.data.datas.data;
       setEmployeeData(data);
     } catch (error) {
@@ -130,9 +129,7 @@ const ScheduleListPage = () => {
     if (!deptId) return;
     setIsLoading(true);
     try {
-      const response = await axios.get(
-        `${baseUrl}/api/shift-schedules/${deptId}/details`,
-      );
+      const response = await api.get(`/shift-schedules/${deptId}/details`);
       const data = response.data.data.datas;
       setScheduleData(data);
     } catch (error) {
@@ -156,9 +153,7 @@ const ScheduleListPage = () => {
       await Promise.all(
         departmentData.map(async (dept) => {
           try {
-            const res = await api.get(
-              `${baseUrl}/api/shift-schedules/${dept.id}/details`,
-            );
+            const res = await api.get(`/shift-schedules/${dept.id}/details`);
             const data = res.data.data.datas;
             const hasDataForPeriod = data.some((schedule: any) => {
               const date = new Date(schedule.start_date || schedule.created_at);

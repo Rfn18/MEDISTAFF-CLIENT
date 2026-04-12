@@ -17,7 +17,7 @@ export default function SideModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex justify-end bg-black/20 z-50 animate-[slideIn_0.3s_ease-in-out]">
+    <div className="fixed inset-0 flex justify-end bg-black/20 z-999 animate-[slideIn_0.3s_ease-in-out]">
       <div className="flex flex-col bg-accent-foreground w-100 h-full overflow-y-auto shadow-md">
         {/* Header */}
         <div className="sticky top-0 bg-accent-foreground flex items-center justify-between p-4 border-b border-border">
