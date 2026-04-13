@@ -24,15 +24,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (stored) {
       const parsed: AuthData = JSON.parse(stored);
-      setUser(parsed.datas.user);
-      setToken(parsed.datas.token);
+      setUser(parsed.user);
+      setToken(parsed.token);
     }
   }, []);
 
   const login = (data: AuthData) => {
     localStorage.setItem("auth", JSON.stringify(data));
-    setUser(data.datas.user);
-    setToken(data.datas.token);
+    setUser(data.user);
+    setToken(data.token);
   };
 
   const logout = () => {

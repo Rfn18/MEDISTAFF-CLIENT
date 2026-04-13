@@ -3,6 +3,8 @@ import { AuthCard } from "../../components/auth/AuthCardt";
 import { Link, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
+import { toast } from "sonner";
+import { toastError } from "../../lib/Toast";
 
 export const Login = () => {
   const [showPw, setShowPw] = useState<boolean>(false);
@@ -11,11 +13,9 @@ export const Login = () => {
     password: "",
   });
   const [alert, setAlert] = useState<boolean>(false);
-  const [errorAlert, setErrorAlert] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const auth = localStorage.getItem("auth");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -29,17 +29,11 @@ export const Login = () => {
       const response = await api.post("/login", data);
 
       const result = response.data;
-      const authData = result.data; 
+      const authData = result.data.datas;
+      console.log(authData);
 
       localStorage.setItem("auth", JSON.stringify(authData));
-    } catch (error) {
-      console.error(error);
-      setErrorAlert(!errorAlert);
-      setTimeout(() => {
-        setErrorAlert(false);
-      }, 5000);
-    } finally {
-      const authData = JSON.parse(localStorage.getItem("auth")!).datas;
+
       if (authData.user.role_id === 1) {
         navigate("/dashboard");
       } else if (authData.user.role_id === 2) {
@@ -47,6 +41,25 @@ export const Login = () => {
       } else if (authData.user.role_id === 3) {
         navigate("/staff/dashboard");
       }
+    } catch (error: any) {
+      setLoading(false);
+
+      if (error.response) {
+        const status = error.response.status;
+
+        if (status === 400) {
+          toastError("Email atau password salah");
+        } else if (status === 422) {
+          toastError("Validasi gagal");
+        } else if (status === 500) {
+          toastError("Server error, coba lagi nanti");
+        } else {
+          toastError("Terjadi kesalahan");
+        }
+      } else {
+        toastError("Tidak bisa terhubung ke server");
+      }
+    } finally {
       setLoading(false);
     }
   };
@@ -66,36 +79,6 @@ export const Login = () => {
 
   return (
     <AuthCard>
-      {/* {alert && (
-        <Toast
-          message={
-            <div className="flex items-center justify-center gap-4">
-              <CircleCheck size={20} className="text-[#119184]" />
-              <div className="text-[#119184]">
-                <h2 className="text-sm font-bold">Creating account...</h2>
-                <p className="text-sm">
-                  Welcome to TehMallPos. Please login to continue
-                </p>
-              </div>
-            </div>
-          }
-        />
-      )}
-      {errorAlert && (
-        <Toast
-          message={
-            <div className="flex items-center justify-center gap-4">
-              <CircleAlert size={20} className="text-[#FF4400]" />
-              <div className="text-[#FF4400]">
-                <h2 className="text-sm font-bold">Invalid Credentials</h2>
-                <p className="text-sm">
-                  Email atau password salah. Silahkan coba lagi
-                </p>
-              </div>
-            </div>
-          }
-        />
-      )} */}
       <div className="w-full flex flex-col items-center gap-2">
         <h1 className="text-xl font-semibold">Login To Your Account</h1>
         <p className="text-sm opacity-70">Enter your credentials to continue</p>

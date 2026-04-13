@@ -8,7 +8,12 @@ import {
 } from "../../components/ui/card";
 import type { CardItem } from "../../types/card";
 import { useEffect, useState } from "react";
-import type { Employee, LeaveRequest, Department } from "../../types/userType";
+import type {
+  Employee,
+  LeaveRequest,
+  Department,
+  EmployeeByCategories,
+} from "../../types/userType";
 import api from "../../services/api";
 import AttendanceDashboard from "../../components/dashboard/AttendanceDashboard";
 import { EmployeeTableDashboard } from "../../components/dashboard/dashboardTable";
@@ -16,6 +21,10 @@ import { CardSkeleton, TableSkeleton } from "../../components/ui/skeletonLoad";
 
 const Dashboard = () => {
   const [employee, setEmployee] = useState<Employee[]>([]);
+  const [employeeCount, setEmployeeCount] = useState<number>(0);
+  const [employeeByCategory, setEmployeeByCategory] = useState<
+    EmployeeByCategories[]
+  >([]);
   const [department, setDepartment] = useState<Department[]>([]);
   const [shift, setShift] = useState([]);
   const [leaveRequest, setLeaveRequest] = useState<LeaveRequest[]>([]);
@@ -29,6 +38,18 @@ const Dashboard = () => {
       const responseEmployee = await api.get(`/employees`);
       const dataEmployee = responseEmployee.data.data.datas.data;
       setEmployee(dataEmployee);
+      setEmployeeCount(responseEmployee.data.data.datas.total);
+
+      const medicalEmployee = await api.get("/employee/medical-staff");
+      const nonMedicalEmployee = await api.get("/employee/non-medical-staff");
+      const dataMedicalEmployee = medicalEmployee.data.data.datas;
+      const dataNonMedicalEmployee = nonMedicalEmployee.data.data.datas;
+      setEmployeeByCategory([
+        {
+          medical: dataMedicalEmployee,
+          non_medical: dataNonMedicalEmployee,
+        },
+      ]);
 
       // department
       const responseDepartment = await api.get(`/departments`);
@@ -62,31 +83,30 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  const countEmployee = () => {
-    return employee?.length ? employee.length : 0;
-  };
-
   const countLeaveRequestPending = () => {
     return leaveRequest.filter((item) => item.status === "pending").length;
   };
+
+  const medicalEmployee = employeeByCategory[0]?.medical as string[];
+  const nonMedicalEmployee = employeeByCategory[0]?.non_medical as string[];
 
   const cardItem: CardItem[] = [
     {
       id: 1,
       title: "Total Karyawan",
-      amount: countEmployee(),
+      amount: employeeCount,
       icon: Users,
     },
     {
       id: 2,
       title: "Staff Medis",
-      amount: employee.filter((item) => item.position_id === 2).length || 0,
+      amount: medicalEmployee?.length || 0,
       icon: Stethoscope,
     },
     {
       id: 3,
       title: "Staff Non-Medis",
-      amount: employee.filter((item) => item.position_id !== 2).length || 0,
+      amount: nonMedicalEmployee?.length || 0,
       icon: HardHat,
     },
     {

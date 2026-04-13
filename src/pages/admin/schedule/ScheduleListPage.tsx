@@ -9,12 +9,12 @@ import {
   LayoutDashboard,
   CalendarPlus,
   Loader2,
+  Settings,
 } from "lucide-react";
 import Layout from "../../../components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader } from "../../../components/ui/card";
 import SelectField from "../../../components/ui/selectField";
 import { useEffect, useMemo, useRef, useState } from "react";
-import axios from "axios";
 import {
   transformSchedule,
   getDaysInMonth,
@@ -26,6 +26,7 @@ import { Loading } from "../../../components/ui/load";
 // Internal components
 import DepartmentStatusGrid from "../../../components/schedule/DepartmentStatusGrid";
 import ScheduleGenerator from "../../../components/schedule/ScheduleGenerator";
+import ShiftManagement from "./ShiftManagement";
 import api from "../../../services/api";
 
 const MONTH_OPTIONS = [
@@ -57,10 +58,9 @@ const generateYearOptions = () => {
 
 const YEAR_OPTIONS = generateYearOptions();
 
-type TabType = "jadwal" | "status" | "buat";
+type TabType = "jadwal" | "status" | "buat" | "kelola-shift";
 
 const ScheduleListPage = () => {
-
   const [activeTab, setActiveTab] = useState<TabType>("jadwal");
 
   // Data states
@@ -117,8 +117,11 @@ const ScheduleListPage = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await api.get(`/employees`);
-      const data = response.data.data.datas.data;
+      const response = await api.get(
+        `/employees/department/${selectedDepartment}`,
+      );
+
+      const data = response.data.data.datas;
       setEmployeeData(data);
     } catch (error) {
       console.error("fetching employee error", error);
@@ -178,8 +181,11 @@ const ScheduleListPage = () => {
   };
 
   useEffect(() => {
-    fetchDepartment();
     fetchEmployees();
+  }, [departmentData]);
+
+  useEffect(() => {
+    fetchDepartment();
   }, []);
 
   useEffect(() => {
@@ -227,6 +233,8 @@ const ScheduleListPage = () => {
   const filteredSchedule = employeeShift.filter((item: any) => {
     return item.name?.toLowerCase().includes(searchTerm.toLowerCase());
   });
+
+  console.log(employeeData);
 
   const stats = useMemo(() => {
     const totalEmployees = employeeShift.length;
@@ -386,6 +394,13 @@ const ScheduleListPage = () => {
           <CalendarPlus size={16} />
           Buat Jadwal
         </button>
+        <button
+          onClick={() => setActiveTab("kelola-shift")}
+          className={`flex w-fit items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${activeTab === "kelola-shift" ? "bg-background text-blue-dark" : "text-blue-dark/60"}`}
+        >
+          <Settings size={16} />
+          Kelola Shift
+        </button>
       </div>
 
       {/* Stats Summary (Only visible in Jadwal) */}
@@ -448,7 +463,7 @@ const ScheduleListPage = () => {
 
       {/* Main Container */}
       <Card className="border-none mt-6 h-auto shadow-sm">
-        {activeTab !== "buat" && (
+        {activeTab !== "buat" && activeTab !== "kelola-shift" && (
           <CardHeader className="bg-slate-50/50 rounded-t-xl border-b border-border/80">
             <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-4">
               <div className="flex flex-wrap gap-4">
@@ -775,6 +790,13 @@ const ScheduleListPage = () => {
                   // Optional: maybe trigger confetti globally
                 }}
               />
+            </div>
+          )}
+
+          {/* TAB 4: KELOLA SHIFT */}
+          {activeTab === "kelola-shift" && (
+            <div className="animate-[slideIn_0.3s_ease-out]">
+              <ShiftManagement />
             </div>
           )}
         </CardContent>

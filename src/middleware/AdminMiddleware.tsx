@@ -7,9 +7,9 @@ export default function AdminMiddleware() {
     return <Navigate to="/login" replace />;
   }
 
-  const authDatas = JSON.parse(auth!).datas;
+  const authDatas = JSON.parse(auth!);
 
-  if (authDatas.user.role_id !== 2) {
+  if (authDatas.role.is_admin === 0) {
     return <Navigate to="/unauthorized" replace />;
   }
 

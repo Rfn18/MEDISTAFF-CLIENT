@@ -20,17 +20,18 @@ import AttendanceSettingsPage from "./pages/admin/attendance/AttendanceSettingsP
 import StaffSchedulePage from "./pages/staff/schedule/StaffSchedulePage";
 import ProfilePage from "./pages/shared/ProfilePage";
 import EmployeeProfileAdmin from "./pages/admin/management/EmployeeProfileAdmin";
-import FluxAdminDashboard from "./pages/admin/attendance/FluxAdminDashboard";
 import FluxEmployeeDashboard from "./pages/staff/attendance/FluxEmployeeDashboard";
 import StaffPayrollPage from "./pages/staff/PayrollPage";
 import PayrollPage from "./pages/admin/payroll/PayrollPage";
 import PayrollComponent from "./pages/admin/payroll/PayrollComponent";
 import { useAuth } from "./context/AuthContext";
+import { Toaster } from "sonner";
 
 function App() {
   const { user } = useAuth();
   return (
     <BrowserRouter>
+      <Toaster />
       <Routes>
         {user ? (
           <>
@@ -83,7 +84,6 @@ function App() {
             path="/admin/karyawan/:id"
             element={<EmployeeProfileAdmin />}
           />
-          <Route path="/admin/flux-dashboard" element={<FluxAdminDashboard />} />
           {/* Schedule */}
           <Route path="/admin/jadwal-shift" element={<ScheduleListPage />} />
           <Route path="/admin/request-shift" element={<RequestSchedule />} />

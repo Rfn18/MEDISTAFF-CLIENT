@@ -73,24 +73,32 @@ const LeaveRequestPage = () => {
     }
   };
 
-  console.log(leaveForm);
+  const countApproved = leaveData.filter(
+    (item) => item.status === "approved",
+  ).length;
+  const countRejected = leaveData.filter(
+    (item) => item.status === "rejected",
+  ).length;
+  const countPending = leaveData.filter(
+    (item) => item.status === "pending",
+  ).length;
   const cardItem = [
     {
       id: 1,
       title: "Disetujui",
-      amount: 20,
+      amount: countApproved,
       icon: CircleCheck,
     },
     {
       id: 2,
       title: "Ditolak",
-      amount: 10,
+      amount: countRejected,
       icon: CircleX,
     },
     {
       id: 3,
       title: "Pending",
-      amount: 100,
+      amount: countPending,
       icon: MailQuestionMark,
     },
   ];

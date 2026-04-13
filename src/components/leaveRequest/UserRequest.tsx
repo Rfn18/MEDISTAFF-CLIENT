@@ -6,7 +6,7 @@ import {
   Pencil,
   Trash,
 } from "lucide-react";
-import type { Employee, LeaveRequest } from "../../types/userType";
+import type { Employee, LeaveRequest, User } from "../../types/userType";
 import DataTable from "../ui/dataTable";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
@@ -28,14 +28,13 @@ export function LeaveRequestTable({
   onEdit: (row: LeaveRequest) => void;
   onDelete: (row: LeaveRequest) => void;
 }) {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
-  const [employee, setEmployee] = useState<Employee[]>([]);
+  const [user, setUser] = useState<User[]>([]);
 
   const fetchEmployee = async () => {
     try {
-      const response = await api.get(`${baseUrl}/api/employees`);
+      const response = await api.get(`/users`);
       const data = response?.data.data.datas.data;
-      setEmployee(data);
+      setUser(data);
     } catch (error) {
       console.error("Error fetching employee data:", error);
     }
@@ -91,14 +90,14 @@ export function LeaveRequestTable({
     {
       header: "Disetujui Oleh",
       render: (row: LeaveRequest) => {
-        const approvedEmployee = employee?.find(
+        const approvedEmployee = user?.find(
           (item) => item.id === Number(row.approved_by),
         );
         return (
           <div>
             {approvedEmployee ? (
               <div className="flex flex-col">
-                <p>{approvedEmployee.full_name}</p>
+                <p>{approvedEmployee.name}</p>
                 <p className="text-xs text-blue-dark/60">{row.approved_at}</p>
               </div>
             ) : (
@@ -148,7 +147,13 @@ export function LeaveAgreementTable({
       render: (row: LeaveRequest) => (
         <div className="flex gap-4">
           <img
-            src={`http://127.0.0.1:8000/storage/employee/1774284184.fasterino-rafael.jpg`}
+            src={
+              row.employee?.photo
+                ? `${import.meta.env.VITE_API_BASE_URL}/storage/employee/${row.employee.photo}`
+                : "https://ui-avatars.com/api/?name=" +
+                  encodeURIComponent(row.employee?.full_name || "User") +
+                  "&background=cce3de&color=03045e"
+            }
             className="w-10 h-10 object-cover object-center rounded-full"
           />
           <div>

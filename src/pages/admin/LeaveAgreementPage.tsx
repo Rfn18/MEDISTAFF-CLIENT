@@ -14,14 +14,13 @@ import api from "../../services/api";
 import { CenterModal } from "../../components/ui/Modal";
 
 const LeaveAgreementPage = () => {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [leaveData, setLeaveData] = useState<LeaveRequest[]>([]);
   const [leaveForm, setLeaveForm] = useState<LeaveRequest | null>(null);
   const [open, setOpen] = useState<boolean>(false);
 
   const fetchLeaveData = async () => {
     try {
-      const response = await api.get(`${baseUrl}/api/leave-requests`);
+      const response = await api.get(`/leave-requests`);
       const data = response?.data.data.datas.data;
       setLeaveData(data);
     } catch (error) {
@@ -33,29 +32,39 @@ const LeaveAgreementPage = () => {
     fetchLeaveData();
   }, []);
 
+  console.log(leaveData);
+
   const openDetailRequest = (row: LeaveRequest) => {
     setLeaveForm(row);
     setOpen(true);
   };
-
-  console.log(leaveForm);
+  
+  const countApproved = leaveData.filter(
+    (item) => item.status === "approved",
+  ).length;
+  const countRejected = leaveData.filter(
+    (item) => item.status === "rejected",
+  ).length;
+  const countPending = leaveData.filter(
+    (item) => item.status === "pending",
+  ).length;
   const cardItem = [
     {
       id: 1,
       title: "Disetujui",
-      amount: 20,
+      amount: countApproved,
       icon: CircleCheck,
     },
     {
       id: 2,
       title: "Ditolak",
-      amount: 10,
+      amount: countRejected,
       icon: CircleX,
     },
     {
       id: 3,
       title: "Pending",
-      amount: 100,
+      amount: countPending,
       icon: MailQuestionMark,
     },
   ];
@@ -90,7 +99,7 @@ const LeaveAgreementPage = () => {
     if (!leaveForm) return;
     setIsProcessing(true);
     try {
-      await api.put(`${baseUrl}/api/leave-requests/${leaveForm.id}/${action}`);
+      await api.put(`/leave-requests/${leaveForm.id}/${action}`);
       setOpen(false);
       setLeaveForm(null);
       fetchLeaveData();
@@ -201,7 +210,7 @@ const LeaveAgreementPage = () => {
               <img
                 src={
                   leaveForm.employee?.photo
-                    ? `${baseUrl}/storage/employee/${leaveForm.employee.photo}`
+                    ? `${import.meta.env.VITE_API_BASE_URL}/storage/employee/${leaveForm.employee.photo}`
                     : "https://ui-avatars.com/api/?name=" +
                       encodeURIComponent(
                         leaveForm.employee?.full_name || "User",
@@ -210,14 +219,6 @@ const LeaveAgreementPage = () => {
                 }
                 alt={leaveForm.employee?.full_name}
                 className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover object-center ring-4 ring-blue-50 shadow-sm"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "https://ui-avatars.com/api/?name=" +
-                    encodeURIComponent(
-                      leaveForm.employee?.full_name || "User",
-                    ) +
-                    "&background=cce3de&color=03045e";
-                }}
               />
               <div className="flex-1">
                 <h2 className="font-bold text-2xl text-blue-dark tracking-tight">

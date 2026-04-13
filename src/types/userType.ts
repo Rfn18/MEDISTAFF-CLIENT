@@ -26,6 +26,11 @@ export type Employee = {
   };
 };
 
+export type EmployeeByCategories = {
+  medical: number | string[];
+  non_medical: number | string[];
+};
+
 export type User = {
   id?: number;
   name: string;
@@ -59,10 +64,9 @@ export type User = {
 };
 
 export type AuthData = {
-  datas: {
-    token: string;
-    user: User;
-  };
+  token: string;
+  user: User;
+  role: Role;
   message: string;
   status: string;
 };
@@ -85,6 +89,7 @@ export type Role = {
   id: number;
   role_name: string;
   description: string;
+  is_admin: boolean;
 };
 
 export type LeaveRequest = {
@@ -133,4 +138,12 @@ export type Payroll = {
   base_salary?: number;
   status?: string;
   created_at?: string;
+};
+
+export type Shift = {
+  id: number;
+  shift_name: string;
+  start_time: string;
+  end_time: string;
+  description: string;
 };

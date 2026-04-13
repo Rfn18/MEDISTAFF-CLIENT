@@ -1,10 +1,11 @@
-import { Pencil, Power, Trash } from "lucide-react";
+import { Clock, Pencil, Power, Trash } from "lucide-react";
 import DataTable from "../ui/dataTable";
 import type {
   Department,
   Employee,
   Position,
   Role,
+  Shift,
   User,
 } from "../../types/userType";
 import { Link } from "react-router-dom";
@@ -296,6 +297,77 @@ export function UserTable({
     {
       header: "Aksi",
       render: (row: User) => (
+        <>
+          <button
+            onClick={() => onEdit?.(row)}
+            className="text-sm text-blue-dark px-2 py-2 cursor-pointer hover:bg-success/10 rounded transition"
+          >
+            <Pencil size={16} className="text-[#2f524a]" />
+          </button>
+
+          <button
+            onClick={() => onDelete?.(row)}
+            className="text-sm text-warning px-2 py-2 ml-2 cursor-pointer hover:bg-warning/10 rounded transition"
+          >
+            <Trash size={16} className="text-red-500" />
+          </button>
+        </>
+      ),
+    },
+  ];
+
+  return <DataTable columns={columns} data={data} />;
+}
+
+export function ShiftTable({
+  data,
+  onEdit,
+  onDelete,
+}: {
+  data: Shift[];
+  onEdit?: (row: Shift) => void;
+  onDelete?: (row: Shift) => void;
+}) {
+  const formatTime = (time: string) => {
+    return time?.slice(0, 5) || "-";
+  };
+
+  const columns: Column<Shift>[] = [
+    {
+      header: "ID",
+      render: (row: Shift) => row.id,
+    },
+    {
+      header: "Nama Shift",
+      render: (row: Shift) => (
+        <span className="font-semibold text-blue-dark">{row.shift_name}</span>
+      ),
+    },
+    {
+      header: "Jam Mulai",
+      render: (row: Shift) => (
+        <div className="flex items-center gap-1.5">
+          <Clock size={14} className="text-green-600" />
+          <span>{formatTime(row.start_time)}</span>
+        </div>
+      ),
+    },
+    {
+      header: "Jam Selesai",
+      render: (row: Shift) => (
+        <div className="flex items-center gap-1.5">
+          <Clock size={14} className="text-red-500" />
+          <span>{formatTime(row.end_time)}</span>
+        </div>
+      ),
+    },
+    {
+      header: "Deskripsi",
+      render: (row: Shift) => row.description,
+    },
+    {
+      header: "Aksi",
+      render: (row: Shift) => (
         <>
           <button
             onClick={() => onEdit?.(row)}
