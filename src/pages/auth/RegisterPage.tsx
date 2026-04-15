@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { getDeviceId } from "../../utils/getDeviceId";
 import api from "../../services/api";
+import { toastError } from "../../lib/Toast";
 
 interface StandForm {
   id: number;
@@ -26,7 +27,6 @@ export const Register = () => {
   const [showPw2, setShowPw2] = useState<Boolean>(false);
 
   const [loading, setLoading] = useState<Boolean>(false);
-  const [standList, setStandList] = useState<StandForm[]>([]);
 
   const url = import.meta.env.VITE_BASE_URL;
 
@@ -37,7 +37,7 @@ export const Register = () => {
     email: "",
     nip: "",
     password: "",
-    password_confirmation: "",
+    confirm_password: "",
     device_id: "",
   });
 
@@ -59,32 +59,27 @@ export const Register = () => {
 
       localStorage.setItem("alert", "true");
       navigate("/login");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      const status = error.response.status;
+      if (status === 400) {
+        toastError("NIP tidak terdaftar atau sudah ada");
+      } else if (status === 422) {
+        toastError("Password tidak cocok");
+      } else if (status === 500) {
+        toastError("Server error, coba lagi nanti");
+      } else {
+        toastError("Terjadi kesalahan");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const fetchDataStand = async () => {
-      try {
-        const response = await api.get(`/stand`);
-        const data = response.data.data.datas.data;
-        setStandList(data);
-      } catch (error) {
-        console.error("Failed fetching data.", error);
-      }
-    };
-
-    fetchDataStand();
-  }, []);
-
   return (
     <AuthCard>
       <div className="w-full flex flex-col items-center gap-2">
         <h1 className="text-xl font-semibold">Create New Account</h1>
-        <p className="text-sm opacity-70">Join TehMallPos to get started</p>
+        <p className="text-sm opacity-70">Register Your Employee Identity</p>
       </div>
       <div className="flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col gap-2 my-4">
@@ -99,6 +94,7 @@ export const Register = () => {
               placeholder="Enter Your Full Name"
               className="w-full h-full text-sm outline-none"
               onChange={handleChange}
+              required
             />
           </div>
           <label htmlFor="username" className="text-sm font-semibold">
@@ -112,6 +108,7 @@ export const Register = () => {
               placeholder="Enter Your Email"
               className="w-full h-full text-sm outline-none"
               onChange={handleChange}
+              required
             />
           </div>
           <label htmlFor="nip" className="text-sm font-semibold">
@@ -125,6 +122,7 @@ export const Register = () => {
               placeholder="Enter Your NIP"
               className="w-full h-full text-sm outline-none"
               onChange={handleChange}
+              required
             />
           </div>
           <label htmlFor="password" className="text-sm font-semibold">
@@ -138,6 +136,7 @@ export const Register = () => {
               placeholder="Create Your password"
               className="w-full h-full text-sm outline-none"
               onChange={handleChange}
+              required
             />
             {showPw1 ? (
               <EyeOff
@@ -163,10 +162,11 @@ export const Register = () => {
             <Lock size="20" className="m-3 opacity-70" />
             <input
               type={showPw2 ? "text" : "password"}
-              name="password_confirmation"
+              name="confirm_password"
               placeholder="Confirm Your password"
               className="w-full h-full text-sm outline-none"
               onChange={handleChange}
+              required
             />
             {showPw2 ? (
               <EyeOff

@@ -14,6 +14,7 @@ import {
   BadgeCheck,
   Clock,
   ShieldCheck,
+  BadgeAlert,
 } from "lucide-react";
 import { Loading } from "../../components/ui/load";
 
@@ -91,9 +92,7 @@ export default function ProfilePage() {
       <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto animate-[fadeIn_0.4s_ease-out]">
         {/* Banner & Header Section */}
         <div className="bg-white rounded-2xl border border-border overflow-hidden shadow-xs relative">
-          <div className="h-32 bg-gradient-to-r from-blue-primary to-blue-accent w-full opacity-90"></div>
-
-          <div className="px-6 md:px-10 pb-8 flex flex-col md:flex-row gap-6 items-center md:items-end -mt-16 relative z-10">
+          <div className="px-6 md:px-10 pb-8 flex flex-col md:flex-row gap-6 items-center md:items-end relative z-10">
             <div className="relative p-1.5 bg-white rounded-full shadow-md shrink-0">
               <img
                 src={userPhoto}
@@ -106,12 +105,23 @@ export default function ProfilePage() {
                     "&background=cce3de&color=03045e";
                 }}
               />
-              <div
-                className="absolute bottom-2 right-2 bg-success text-white p-1.5 rounded-full border-2 border-white shadow-sm"
-                title="Active"
-              >
-                <BadgeCheck size={16} />
-              </div>
+              {
+                employee.employee_status === "active" ? (
+                  <div
+                    className="absolute bottom-2 right-2 bg-success text-white p-1.5 rounded-full border-2 border-white shadow-sm"
+                    title="Active"
+                  >
+                    <BadgeCheck size={16} />
+                  </div>
+                ) : (
+                  <div
+                    className="absolute bottom-2 right-2 bg-danger text-white p-1.5 rounded-full border-2 border-white shadow-sm"
+                    title="Inactive"
+                  >
+                    <BadgeAlert size={16} />
+                  </div>
+                )
+              }
             </div>
 
             <div className="flex-1 text-center md:text-left mb-2">

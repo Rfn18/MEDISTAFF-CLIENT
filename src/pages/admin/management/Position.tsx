@@ -4,20 +4,17 @@ import { useEffect, useState } from "react";
 import { PositionTable } from "../../../components/dashboard/ManagementDashboard";
 import SideModal from "../../../components/ui/Modal";
 import type { Position } from "../../../types/userType";
-import axios from "axios";
 import PositionForm from "../../../components/form/admin/PositionForm";
 import api from "../../../services/api";
 
 export default function Position() {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
   const [open, setOpen] = useState(false);
   const [positionData, setPositionData] = useState<Position[]>([]);
   const [positionForm, setPositionForm] = useState<Position | null>(null);
 
   const fetchPosition = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/positions`);
+      const response = await api.get(`/positions`);
       const data = response.data.data.datas.data;
       setPositionData(data);
     } catch (error) {

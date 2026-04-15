@@ -12,6 +12,7 @@ import {
   AlertTitle,
 } from "../../../components/ui/alert";
 import { Card } from "../../../components/ui/card";
+import { toastError } from "../../../lib/Toast";
 
 const ScanPage = () => {
   const [scanner, setScanner] = useState<Html5Qrcode | null>(null);
@@ -33,8 +34,8 @@ const ScanPage = () => {
   const fetchEmployee = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/users`);
-      const data = response.data.data.datas.data;
+      const response = await api.get(`/user/shift-schedule/today`);
+      const data = response.data.data.datas.data || response.data.data.datas;
       setUser(data);
     } catch (error) {
       console.error("error fetching employee", error);
@@ -90,7 +91,7 @@ const ScanPage = () => {
       await scanner.start(
         { facingMode: cameraMode },
         {
-          fps: 10,
+          fps: 20,
           qrbox: (viewfinderWidth, viewfinderHeight) => {
             return {
               width: viewfinderWidth * 0.7,
@@ -125,8 +126,8 @@ const ScanPage = () => {
         name: user.find((item) => item.id === data.user_id)?.name!,
         time: time,
       });
-    } catch (error) {
-      console.error("error", error);
+    } catch (error: any) {
+      toastError(error.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -190,18 +191,18 @@ const ScanPage = () => {
             <div className="absolute inset-0 flex items-center justify-center bg-black/60">
               <button
                 onClick={startScan}
-                className="bg-primary text-white px-8 py-3 rounded-full font-semibold transition hover:cursor-pointer hover:scale-105"
+                className="bg-primary z-10 text-white px-8 py-3 rounded-full font-semibold transition hover:cursor-pointer hover:scale-105"
               >
                 Mulai Absen
               </button>
             </div>
           )}
 
-          <div className="relative w-72 h-72 overflow-hidden rounded-3xl">
-            <div id="reader"></div>
+          <div className="relative w-full h-full overflow-hidden rounded-3xl">
+            <div id="reader"  className="w-full h-full"></div>
             {isScanning && (
               <>
-                <div className="absolute inset-0 border-[40px] border-black/30 pointer-events-none"></div>
+                <div className="absolute  inset-0 border-[40px] border-black/30 pointer-events-none"></div>
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-500 shadow-[0_0_15px_#3b82f6] animate-scan-loop"></div>
               </>
             )}

@@ -6,6 +6,7 @@ import SideModal from "../../../components/ui/Modal";
 import type { Role } from "../../../types/userType";
 import axios from "axios";
 import RoleForm from "../../../components/form/admin/RoleForm";
+import api from "../../../services/api";
 
 export default function Role() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -16,7 +17,7 @@ export default function Role() {
 
   const fetchRole = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/roles`);
+      const response = await api.get(`/roles`);
       const data = response.data.data.datas.data;
       setRoleData(data);
     } catch (error) {
@@ -32,7 +33,7 @@ export default function Role() {
     setRoleForm(data);
 
     try {
-      await axios.post(`${baseUrl}/api/roles`, data);
+      await api.post(`/roles`, data);
       setRoleForm(null);
       fetchRole();
     } catch (error) {
@@ -44,7 +45,7 @@ export default function Role() {
 
   const handleDeleteRole = async (row: Role) => {
     try {
-      await axios.delete(`${baseUrl}/api/roles/${row.id}`);
+      await api.delete(`/roles/${row.id}`);
       fetchRole();
     } catch (error) {
       console.error("delete error", error);
@@ -58,7 +59,7 @@ export default function Role() {
 
   const handleUpdateRole = async (data: Role) => {
     try {
-      await axios.post(`${baseUrl}/api/roles/${roleForm?.id}`, {
+      await api.post(`/roles/${roleForm?.id}`, {
         ...data,
         _method: "PUT",
       });

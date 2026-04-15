@@ -19,8 +19,7 @@ import ScanPage from "./pages/admin/attendance/ScanPage";
 import AttendanceSettingsPage from "./pages/admin/attendance/AttendanceSettingsPage";
 import StaffSchedulePage from "./pages/staff/schedule/StaffSchedulePage";
 import ProfilePage from "./pages/shared/ProfilePage";
-import EmployeeProfileAdmin from "./pages/admin/management/EmployeeProfileAdmin";
-import FluxEmployeeDashboard from "./pages/staff/attendance/FluxEmployeeDashboard";
+import EmployeeProfileAdmin from "./pages/admin/management/EmployeeProfileAdmin";;
 import StaffPayrollPage from "./pages/staff/PayrollPage";
 import PayrollPage from "./pages/admin/payroll/PayrollPage";
 import PayrollComponent from "./pages/admin/payroll/PayrollComponent";
@@ -111,10 +110,6 @@ function App() {
           <Route path="/staff/jadwal-shift" element={<StaffSchedulePage />} />
           <Route path="/staff/pengajuan-cuti" element={<LeaveRequestPage />} />
           <Route path="/staff/absensi" element={<QRCodePage />} />
-          <Route
-            path="/staff/flux-attendance"
-            element={<FluxEmployeeDashboard />}
-          />
           <Route path="/staff/gaji" element={<StaffPayrollPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />

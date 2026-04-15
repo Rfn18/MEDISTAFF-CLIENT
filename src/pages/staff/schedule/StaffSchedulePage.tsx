@@ -48,7 +48,6 @@ const generateYearOptions = () => {
 const YEAR_OPTIONS = generateYearOptions();
 
 const StaffSchedulePage = () => {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const { user } = useAuth();
 
   // Data states
@@ -61,12 +60,12 @@ const StaffSchedulePage = () => {
 
   // UI states
   const [isLoading, setIsLoading] = useState(false);
-
+  const departmentId = user?.employee?.department_id;
   // Fetch data
   const fetchEmployees = async () => {
     try {
-      const response = await api.get(`${baseUrl}/api/employees`);
-      const data = response.data?.data?.datas?.data || response.data?.data;
+      const response = await api.get(`/employees/department/${departmentId}`);
+      const data = response.data?.data?.datas;
       setEmployeeData(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("fetching employee error", error);
@@ -88,22 +87,15 @@ const StaffSchedulePage = () => {
     }
   };
 
-  const departmentId = employeeData?.find(
-    (emp) => emp.id === user?.employee_id,
-  )?.department_id;
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [baseUrl]);
-
   useEffect(() => {
     if (departmentId) {
+      fetchEmployees();
       fetchSchedule(departmentId);
     } else {
       const flatDept = user?.department_id;
       if (flatDept) fetchSchedule(flatDept);
     }
-  }, [departmentId, user, baseUrl]);
+  }, [departmentId, user]);
 
   const daysInMonth = getDaysInMonth(selectedMonth, selectedYear);
 
@@ -119,10 +111,10 @@ const StaffSchedulePage = () => {
   }, [scheduleData, selectedMonth, selectedYear]);
 
   const transformedData = useMemo(() => {
-    if (!employeeData.length || !filteredByPeriod.length) return [];
+    const shiftDetails = filteredByPeriod[0]?.shift_schedules_details;
 
     return transformSchedule(
-      filteredByPeriod[0].shift_schedules_details,
+      shiftDetails,
       employeeData,
       daysInMonth,
     );

@@ -3,8 +3,7 @@ import { AuthCard } from "../../components/auth/AuthCardt";
 import { Link, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
-import { toast } from "sonner";
-import { toastError } from "../../lib/Toast";
+import { toastError, toastSuccess } from "../../lib/Toast";
 
 export const Login = () => {
   const [showPw, setShowPw] = useState<boolean>(false);
@@ -68,11 +67,10 @@ export const Login = () => {
     const indicatorAlert = localStorage.getItem("alert");
 
     if (indicatorAlert) {
-      setAlert(!alert);
+      toastSuccess("Akun berhasil dibuat, silahkan login");
 
       setTimeout(() => {
         localStorage.removeItem("alert");
-        setAlert(false);
       }, 5000);
     }
   }, []);

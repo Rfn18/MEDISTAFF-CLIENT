@@ -5,12 +5,9 @@ import { DepartmentTable } from "../../../components/dashboard/ManagementDashboa
 import SideModal from "../../../components/ui/Modal";
 import DepartmentForm from "../../../components/form/admin/DepartmentForm";
 import type { Department as DepartmentType } from "../../../types/userType";
-import axios from "axios";
 import api from "../../../services/api";
 
 export default function Department() {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
   const [open, setOpen] = useState(false);
   const [departmentData, setDepartmentData] = useState<DepartmentType[]>([]);
   const [departmentForm, setDepartmentForm] = useState<DepartmentType | null>(
@@ -35,7 +32,7 @@ export default function Department() {
     setDepartmentForm(data);
 
     try {
-      await axios.post(`${baseUrl}/api/departments`, data);
+      await api.post(`/departments`, data);
       setDepartmentForm(null);
       fetchDepartment();
     } catch (error) {

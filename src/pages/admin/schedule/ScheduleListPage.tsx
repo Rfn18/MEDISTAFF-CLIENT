@@ -20,7 +20,7 @@ import {
   getDaysInMonth,
   shiftCodeToId,
 } from "../../../utils/transformSchedule";
-import type { Department } from "../../../types/userType";
+import type { Shift, Department } from "../../../types/userType";
 import { Loading } from "../../../components/ui/load";
 
 // Internal components
@@ -61,7 +61,8 @@ const YEAR_OPTIONS = generateYearOptions();
 type TabType = "jadwal" | "status" | "buat" | "kelola-shift";
 
 const ScheduleListPage = () => {
-  const [activeTab, setActiveTab] = useState<TabType>("jadwal");
+  const [shiftData, setShiftData] = useState<Shift[]>([])
+  const [activeTab, setActiveTab] = useState<TabType>(shiftData?.length > 0 ? "jadwal" : "kelola-shift");
 
   // Data states
   const [scheduleData, setScheduleData] = useState<any>([]);
@@ -78,6 +79,7 @@ const ScheduleListPage = () => {
 
   // UI states
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingShift, setIsLoadingShift] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
 
   // Status check states
@@ -128,6 +130,8 @@ const ScheduleListPage = () => {
     }
   };
 
+  console.log(employeeData)
+
   const fetchSchedule = async (deptId: number | string) => {
     if (!deptId) return;
     setIsLoading(true);
@@ -141,6 +145,19 @@ const ScheduleListPage = () => {
     } finally {
       setIsLoading(false);
       setHasInitialized(true);
+    }
+  };
+
+  const fetchShift = async () => {
+    try {
+      setIsLoadingShift(true);
+      const response = await api.get(`/shifts`);
+      const data = response.data.data.datas.data;
+      setShiftData(data);
+    } catch (error) {
+      console.error("fetching shift error", error);
+    } finally {
+      setIsLoadingShift(false);
     }
   };
 
@@ -179,17 +196,15 @@ const ScheduleListPage = () => {
       setIsOverviewLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchEmployees();
-  }, [departmentData]);
-
+  
   useEffect(() => {
     fetchDepartment();
+    fetchShift();
   }, []);
 
   useEffect(() => {
     if (selectedDepartment) {
+      fetchEmployees(); 
       fetchSchedule(selectedDepartment);
     }
   }, [selectedDepartment]);
@@ -233,8 +248,6 @@ const ScheduleListPage = () => {
   const filteredSchedule = employeeShift.filter((item: any) => {
     return item.name?.toLowerCase().includes(searchTerm.toLowerCase());
   });
-
-  console.log(employeeData);
 
   const stats = useMemo(() => {
     const totalEmployees = employeeShift.length;
@@ -370,38 +383,68 @@ const ScheduleListPage = () => {
           </p>
         </div>
       </div>
+      <div className="mt-4 flex bg-accent-foreground shadow w-fit p-1 rounded-xl">
+  {
+    isLoadingShift ? (
+      <Loader2 className="animate-spin" size={24}/>
+    ) : (
+      <>
+        {shiftData?.length > 0 && (
+          <>
+            <button
+              onClick={() => setActiveTab("jadwal")}
+              className={`flex w-fit items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${
+                activeTab === "jadwal"
+                  ? "bg-background text-blue-dark"
+                  : "text-blue-dark/60"
+              }`}
+            >
+              <CalendarDays size={16} />
+              Jadwal Shift
+            </button>
 
-      {/* Modern Tabs */}
-      <div className="mt-4 flex bg-accent-foreground shadow w-fit p-1 rounded-xl ">
-        <button
-          onClick={() => setActiveTab("jadwal")}
-          className={`flex w-fit items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${activeTab === "jadwal" ? "bg-background text-blue-dark" : "text-blue-dark/60"}`}
-        >
-          <CalendarDays size={16} />
-          Jadwal Shift
-        </button>
-        <button
-          onClick={() => setActiveTab("status")}
-          className={`flex w-fit items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${activeTab === "status" ? "bg-background text-blue-dark" : "text-blue-dark/60"}`}
-        >
-          <LayoutDashboard size={16} />
-          Status Departemen
-        </button>
-        <button
-          onClick={() => setActiveTab("buat")}
-          className={`flex w-fit items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${activeTab === "buat" ? "bg-background text-blue-dark" : "text-blue-dark/60"}`}
-        >
-          <CalendarPlus size={16} />
-          Buat Jadwal
-        </button>
+            <button
+              onClick={() => setActiveTab("status")}
+              className={`flex w-fit items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${
+                activeTab === "status"
+                  ? "bg-background text-blue-dark"
+                  : "text-blue-dark/60"
+              }`}
+            >
+              <LayoutDashboard size={16} />
+              Status Departemen
+            </button>
+
+            <button
+              onClick={() => setActiveTab("buat")}
+              className={`flex w-fit items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${
+                activeTab === "buat"
+                  ? "bg-background text-blue-dark"
+                  : "text-blue-dark/60"
+              }`}
+            >
+              <CalendarPlus size={16} />
+              Buat Jadwal
+            </button>
+          </>
+        )}
+
+        {/* Ini selalu tampil */}
         <button
           onClick={() => setActiveTab("kelola-shift")}
-          className={`flex w-fit items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${activeTab === "kelola-shift" ? "bg-background text-blue-dark" : "text-blue-dark/60"}`}
+          className={`flex w-fit items-center gap-2 text-sm font-semibold px-10 py-2 rounded-lg cursor-pointer ${
+            activeTab === "kelola-shift"
+              ? "bg-background text-blue-dark"
+              : "text-blue-dark/60"
+          }`}
         >
           <Settings size={16} />
           Kelola Shift
         </button>
-      </div>
+      </>
+    )
+  }
+</div>
 
       {/* Stats Summary (Only visible in Jadwal) */}
       {activeTab === "jadwal" &&
@@ -675,7 +718,7 @@ const ScheduleListPage = () => {
                             </td>
                             <td className="sticky left-0 z-10 bg-white group-hover:bg-slate-50/50 border-r border-b border-border p-2 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
                               <p className="line-clamp-1 font-semibold text-blue-dark">
-                                {employee.name}
+                                {employee?.name}
                               </p>
                             </td>
                             {employee.shifts.map(
@@ -692,7 +735,7 @@ const ScheduleListPage = () => {
                                     onContextMenu={(e) =>
                                       handleContextMenu(
                                         e,
-                                        employee.employee_id,
+                                        employee?.employee_id,
                                         day,
                                         detailId,
                                       )
@@ -705,9 +748,9 @@ const ScheduleListPage = () => {
                                     ${isUpdating ? "animate-pulse opacity-50 bg-slate-100" : ""}
                                     ${!isUpdating && detailId ? "cursor-context-menu hover:brightness-95 hover:shadow-inner" : "cursor-not-allowed opacity-50"}
                                   `}
-                                    title={`${employee.name} — Hari ke-${day + 1}${detailId ? " (Klik kanan untuk edit)" : " (No Detail ID)"}`}
+                                    title={`${employee?.name} — Hari ke-${day + 1}${detailId ? " (Klik kanan untuk edit)" : " (No Detail ID)"}`}
                                   >
-                                    {isUpdating ? (
+                                    {isUpdating ? ( 
                                       <Loader2
                                         size={12}
                                         className="animate-spin mx-auto text-blue-primary"

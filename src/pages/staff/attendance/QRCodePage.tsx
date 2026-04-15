@@ -12,8 +12,10 @@ import { QRCodeCanvas } from "qrcode.react";
 import { Loading } from "../../../components/ui/load";
 import type { QrToken } from "../../../types/attendanceType";
 import { useAuth } from "../../../context/AuthContext";
+import { useCountdown } from "../../../hooks/useCountdown";
 
 const QRCodePage = () => {
+  const { time, isActive, start, stop, reset } = useCountdown(30);
   const [qrToken, setQrToken] = useState<QrToken>({
     qr_payload: "",
     device_id: "",
@@ -21,7 +23,6 @@ const QRCodePage = () => {
     latitude: 0,
     user_id: 0,
   });
-  const [countdownTimer, setCountdownTimer] = useState<number>(30);
   const [loading, setLoading] = useState<boolean>(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     null,
@@ -52,20 +53,15 @@ const QRCodePage = () => {
   const startCountdown = async () => {
     setIsQrCode(true);
     await fetchQrCode();
-    const countdownTimer = setInterval(() => {
-      setCountdownTimer((prev) => (prev > 0 ? prev - 1 : 30));
-    }, 1000);
-
-    return () => {
-      clearInterval(countdownTimer);
-    };
+    start()
+    
   };
 
   useEffect(() => {
-    if (countdownTimer === 0) {
+    if (time === 0) {
       setIsQrCode(false);
     }
-  }, [countdownTimer]);
+  }, [time]);
 
   const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
     return new Promise((resolve, reject) => {
@@ -161,7 +157,7 @@ const QRCodePage = () => {
           <p className="mt-4 text-blue-dark">
             {isQrCode && !loading && (
               <p>
-                QR Code akan diperbarui dalam <b>{countdownTimer} detik</b>.
+                QR Code akan diperbarui dalam <b>{time} detik</b>.
               </p>
             )}
           </p>

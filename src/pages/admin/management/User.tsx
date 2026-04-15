@@ -7,6 +7,7 @@ import type { User } from "../../../types/userType";
 import axios from "axios";
 import UserForm from "../../../components/form/admin/UserForm";
 import { Loading } from "../../../components/ui/load";
+import api from "../../../services/api";
 
 export default function UserPage() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -19,7 +20,7 @@ export default function UserPage() {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${baseUrl}/api/users`);
+      const response = await api.get(`/users`);
       const data = response.data.data.datas.data;
       setUserData(data);
     } catch (error) {
@@ -38,7 +39,7 @@ export default function UserPage() {
 
     try {
       setLoading(true);
-      await axios.post(`${baseUrl}/api/users`, data);
+      await api.post(`/users`, data);
       setUserForm(null);
       fetchUser();
     } catch (error) {
@@ -53,14 +54,13 @@ export default function UserPage() {
     const newStatus = row.is_active === 1 ? 0 : 1;
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${baseUrl}/api/users/${row.id}/status`,
+      const response = await api.post(
+        `/users/${row.id}/status`,
         {
           is_active: newStatus,
           _method: "PUT",
         },
       );
-      console.log(response);
       fetchUser();
     } catch (error) {
       console.error("fething data error", error);
@@ -77,7 +77,7 @@ export default function UserPage() {
   const handleUpdateUser = async (data: User) => {
     try {
       setLoading(true);
-      await axios.post(`${baseUrl}/api/users/${userForm?.id}`, {
+      await api.post(`/users/${userForm?.id}`, {
         ...data,
         _method: "PUT",
       });

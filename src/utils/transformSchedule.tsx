@@ -17,12 +17,12 @@ export const transformSchedule = (
   const employeeMap = new Map(employees.map((emp) => [emp.id, emp.full_name]));
 
   data.forEach((item) => {
-    const employeeId = item.employee_id;
+    const employeeId = item.employee_id;  
 
     if (!result[employeeId]) {
       result[employeeId] = {
         employee_id: employeeId,
-        name: employeeMap.get(employeeId) ?? "Unknown",
+        name: employeeMap?.get(employeeId) ?? "Unknown",
         shifts: Array(days).fill(""),
         detailIds: Array(days).fill(null),
         shiftIds: Array(days).fill(null),
