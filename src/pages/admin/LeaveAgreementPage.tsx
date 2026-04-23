@@ -12,17 +12,30 @@ import { useEffect, useState } from "react";
 import type { LeaveRequest } from "../../types/userType";
 import api from "../../services/api";
 import { CenterModal } from "../../components/ui/Modal";
+import { Paginate } from "../../components/ui/paginate";
 
 const LeaveAgreementPage = () => {
   const [leaveData, setLeaveData] = useState<LeaveRequest[]>([]);
   const [leaveForm, setLeaveForm] = useState<LeaveRequest | null>(null);
   const [open, setOpen] = useState<boolean>(false);
+  const [paginateData, setPaginateData] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
+  const [totalData, setTotalData] = useState(0);
 
   const fetchLeaveData = async () => {
     try {
-      const response = await api.get(`/leave-requests`);
+      const response = await api.get(
+        `/leave-requests?page=${paginateData.current_page}`,
+      );
       const data = response?.data.data.datas.data;
       setLeaveData(data);
+      setTotalData(response?.data.data.datas.total);
+      setPaginateData({
+        current_page: response?.data.data.datas.current_page,
+        last_page: response?.data.data.datas.last_page,
+      });
     } catch (error) {
       console.error("Error fetching leave data:", error);
     }
@@ -30,15 +43,13 @@ const LeaveAgreementPage = () => {
 
   useEffect(() => {
     fetchLeaveData();
-  }, []);
-
-  console.log(leaveData);
+  }, [paginateData.current_page]);
 
   const openDetailRequest = (row: LeaveRequest) => {
     setLeaveForm(row);
     setOpen(true);
   };
-  
+
   const countApproved = leaveData.filter(
     (item) => item.status === "approved",
   ).length;
@@ -192,6 +203,14 @@ const LeaveAgreementPage = () => {
             )}
           </div>
         </Card>
+        {leaveData.length > 0 && (
+          <Paginate
+            data={leaveData}
+            totalData={totalData}
+            paginateData={paginateData}
+            setPaginateData={setPaginateData}
+          />
+        )}
       </div>
 
       <CenterModal

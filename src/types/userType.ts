@@ -60,6 +60,7 @@ export type User = {
   role: {
     id: number;
     role_name: RoleName;
+    is_admin: boolean;
   };
 };
 

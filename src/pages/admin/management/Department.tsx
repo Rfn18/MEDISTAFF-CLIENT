@@ -1,4 +1,4 @@
-import { Plus, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import { Card, CardHeader } from "../../../components/ui/card";
 import { useEffect, useState } from "react";
 import { DepartmentTable } from "../../../components/dashboard/ManagementDashboard";
@@ -6,27 +6,46 @@ import SideModal from "../../../components/ui/Modal";
 import DepartmentForm from "../../../components/form/admin/DepartmentForm";
 import type { Department as DepartmentType } from "../../../types/userType";
 import api from "../../../services/api";
+import { Paginate } from "../../../components/ui/paginate";
+import { Loading } from "../../../components/ui/load";
 
 export default function Department() {
   const [open, setOpen] = useState(false);
+  const [totalData, setTotalData] = useState(0);
   const [departmentData, setDepartmentData] = useState<DepartmentType[]>([]);
+  const [paginateData, setPaginateData] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
+
   const [departmentForm, setDepartmentForm] = useState<DepartmentType | null>(
     null,
   );
+  const [loading, setLoading] = useState(false);
 
   const fetchDepartment = async () => {
     try {
-      const response = await api.get(`/departments`);
+      setLoading(true);
+      const response = await api.get(
+        `/departments?page=${paginateData.current_page}`,
+      );
       const data = response.data.data.datas.data;
       setDepartmentData(data);
+      setPaginateData({
+        current_page: response.data.data.datas.current_page,
+        last_page: response.data.data.datas.last_page,
+      });
+      setTotalData(response.data.data.datas.total);
     } catch (error) {
       console.error("fething data error", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchDepartment();
-  }, []);
+  }, [paginateData.current_page]);
 
   const handleAddDepartment = async (data: DepartmentType) => {
     setDepartmentForm(data);
@@ -97,12 +116,22 @@ export default function Department() {
           </div>
         </CardHeader>
         <div>
-          <DepartmentTable
-            data={departmentData}
-            onEdit={(row) => openEditDepartment(row)}
-            onDelete={(row) => handleDeleteDepartment(row)}
-          />
+          {loading ? (
+            <Loading message="loading data..." />
+          ) : (
+            <DepartmentTable
+              data={departmentData}
+              onEdit={(row) => openEditDepartment(row)}
+              onDelete={(row) => handleDeleteDepartment(row)}
+            />
+          )}
         </div>
+        <Paginate
+          data={departmentData}
+          totalData={totalData}
+          paginateData={paginateData}
+          setPaginateData={setPaginateData}
+        />
       </Card>
 
       <SideModal

@@ -8,7 +8,7 @@ const DashboardHeader = ({}: {}) => {
   return (
     <>
       <header className="sticky top-0 flex w-full bg-white border-border z-1  lg:border-b">
-        <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
+        <div className="flex lg:flex-col items-center justify-between grow lg:flex-row lg:px-6">
           <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-border sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -32,13 +32,15 @@ const DashboardHeader = ({}: {}) => {
             </button>
             <SearchBar />
           </div>
-          <div className=" mr-4">
+          <div className="flex items-center ">
+          <div className=" mr-4 ">
             <Moon size={20} className="text-blue-dark/40" />
           </div>
           <div className=" mr-4">
             <Bell size={20} className="text-blue-dark/40" />
           </div>
           <UserMenu />
+          </div>
         </div>
       </header>
     </>

@@ -8,6 +8,7 @@ import axios from "axios";
 import UserForm from "../../../components/form/admin/UserForm";
 import { Loading } from "../../../components/ui/load";
 import api from "../../../services/api";
+import { Paginate } from "../../../components/ui/paginate";
 
 export default function UserPage() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -16,13 +17,25 @@ export default function UserPage() {
   const [userData, setUserData] = useState<User[]>([]);
   const [userForm, setUserForm] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const [paginateData, setPaginateData] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
+  const [totalData, setTotalData] = useState(0);
 
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/users`);
+      const response = await api.get(
+        `/users?page=${paginateData.current_page}`,
+      );
       const data = response.data.data.datas.data;
       setUserData(data);
+      setTotalData(response.data.data.datas.total);
+      setPaginateData({
+        current_page: response.data.data.datas.current_page,
+        last_page: response.data.data.datas.last_page,
+      });
     } catch (error) {
       console.error("fething data error", error);
     } finally {
@@ -32,7 +45,7 @@ export default function UserPage() {
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [paginateData.current_page]);
 
   const handleAddUser = async (data: User) => {
     setUserForm(data);
@@ -54,13 +67,10 @@ export default function UserPage() {
     const newStatus = row.is_active === 1 ? 0 : 1;
     try {
       setLoading(true);
-      const response = await api.post(
-        `/users/${row.id}/status`,
-        {
-          is_active: newStatus,
-          _method: "PUT",
-        },
-      );
+      const response = await api.post(`/users/${row.id}/status`, {
+        is_active: newStatus,
+        _method: "PUT",
+      });
       fetchUser();
     } catch (error) {
       console.error("fething data error", error);
@@ -126,12 +136,22 @@ export default function UserPage() {
           </div>
         </CardHeader>
         <div>
-          <UserTable
-            data={userData}
-            onEdit={(row) => openEditUser(row)}
-            onDelete={(row) => handleInactivateUser(row)}
-          />
+          {loading ? (
+            <Loading message="loading data..." />
+          ) : (
+            <UserTable
+              data={userData}
+              onEdit={(row) => openEditUser(row)}
+              onDelete={(row) => handleInactivateUser(row)}
+            />
+          )}
         </div>
+        <Paginate
+          data={userData}
+          totalData={totalData}
+          paginateData={paginateData}
+          setPaginateData={setPaginateData}
+        />
       </Card>
 
       <SideModal

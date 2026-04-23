@@ -130,8 +130,6 @@ const ScheduleListPage = () => {
     }
   };
 
-  console.log(employeeData)
-
   const fetchSchedule = async (deptId: number | string) => {
     if (!deptId) return;
     setIsLoading(true);
@@ -227,7 +225,7 @@ const ScheduleListPage = () => {
     selectedMonth === currentMonth && selectedYear === currentYear;
 
   const filteredByPeriod = useMemo(() => {
-    if (!scheduleData || scheduleData.length === 0) return [];
+    if (!scheduleData ||  scheduleData.length === 0) return [];
     return scheduleData.filter((schedule: any) => {
       const date = new Date(schedule.schedule_date || schedule.created_at);
       return (

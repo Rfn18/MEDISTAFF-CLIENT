@@ -7,6 +7,7 @@ import api from "../../../services/api";
 import type { Department } from "../../../types/userType";
 import { AttendanceTable } from "../../../components/attendance/Attendance";
 import type { Attendance } from "../../../types/attendanceType";
+import { Paginate } from "../../../components/ui/paginate";
 
 const AttendancePage = () => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -16,22 +17,31 @@ const AttendancePage = () => {
   const [open, setOpen] = useState(false);
   const [selectedAttendance, setSelectedAttendance] =
     useState<Attendance | null>(null);
-
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
+  const [totalData, setTotalData] = useState(0);
   const fetchAttendance = async () => {
     try {
-      const response = await api.get(`${baseUrl}/api/attendances`);
+      const response = await api.get(
+        `/attendances?page=${pagination.current_page}`,
+      );
       const data = response.data.data.datas.data;
       setAttendanceData(data);
+      setTotalData(response.data.data.datas.total);
+      setPagination({
+        current_page: response.data.data.datas.current_page,
+        last_page: response.data.data.datas.last_page,
+      });
     } catch (error) {
       console.error("fetching attendance error", error);
     }
   };
 
-  console.log(attendanceData);
-
   const fetchDepartment = async () => {
     try {
-      const response = await api.get(`${baseUrl}/api/departments`);
+      const response = await api.get(`/departments`);
       const data = response.data.data.datas.data;
       setDepartmentData(data);
       if (data.length > 0 && !selectedDepartment) {
@@ -141,6 +151,14 @@ const AttendancePage = () => {
             </div>
           )}
         </CardContent>
+        {attendanceData.length > 0 && (
+          <Paginate
+            data={attendanceData}
+            totalData={totalData}
+            paginateData={pagination}
+            setPaginateData={setPagination}
+          />
+        )}
       </Card>
     </Layout>
   );

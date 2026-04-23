@@ -7,6 +7,8 @@ import type { Role } from "../../../types/userType";
 import axios from "axios";
 import RoleForm from "../../../components/form/admin/RoleForm";
 import api from "../../../services/api";
+import { Paginate } from "../../../components/ui/paginate";
+import { Loading } from "../../../components/ui/load";
 
 export default function Role() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -14,20 +16,36 @@ export default function Role() {
   const [open, setOpen] = useState(false);
   const [roleData, setRoleData] = useState<Role[]>([]);
   const [roleForm, setRoleForm] = useState<Role | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [paginateData, setPaginateData] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
+  const [totalData, setTotalData] = useState(0);
 
   const fetchRole = async () => {
     try {
-      const response = await api.get(`/roles`);
+      setLoading(true);
+      const response = await api.get(
+        `/roles?page=${paginateData.current_page}`,
+      );
       const data = response.data.data.datas.data;
       setRoleData(data);
+      setTotalData(response.data.data.datas.total);
+      setPaginateData({
+        current_page: response.data.data.datas.current_page,
+        last_page: response.data.data.datas.last_page,
+      });
     } catch (error) {
       console.error("fething data error", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchRole();
-  }, []);
+  }, [paginateData.current_page]);
 
   const handleAddRole = async (data: Role) => {
     setRoleForm(data);
@@ -98,12 +116,22 @@ export default function Role() {
           </div>
         </CardHeader>
         <div>
-          <RoleTable
-            data={roleData}
-            onEdit={(row) => openEditRole(row)}
-            onDelete={(row) => handleDeleteRole(row)}
-          />
+          {loading ? (
+            <Loading message="loading data..." />
+          ) : (
+            <RoleTable
+              data={roleData}
+              onEdit={(row) => openEditRole(row)}
+              onDelete={(row) => handleDeleteRole(row)}
+            />
+          )}
         </div>
+        <Paginate
+          data={roleData}
+          totalData={totalData}
+          paginateData={paginateData}
+          setPaginateData={setPaginateData}
+        />
       </Card>
 
       <SideModal

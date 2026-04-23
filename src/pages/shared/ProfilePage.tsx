@@ -50,8 +50,6 @@ export default function ProfilePage() {
     fetchProfile();
   }, [user, baseUrl]);
 
-  console.log(error, employee);
-
   if (loading)
     return (
       <Layout>

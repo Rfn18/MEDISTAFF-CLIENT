@@ -26,6 +26,8 @@ import {
   AlertDescription,
   AlertTitle,
 } from "../../../components/ui/alert";
+import { Paginate } from "../../../components/ui/paginate";
+import { NumericFormat } from "react-number-format";
 
 const MONTHS = [
   "Januari",
@@ -66,6 +68,11 @@ export default function PayrollPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [paginateData, setPaginateData] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
+  const [totalData, setTotalData] = useState(0);
   const [payrolls, setPayrolls] = useState<Payroll[]>([]);
   const [position, setPosition] = useState<Position[]>([]);
   const [allowance, setAllowance] = useState<Allowance[]>([]);
@@ -110,7 +117,14 @@ export default function PayrollPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const empRes = await api.get("/employees");
+      const empRes = await api.get(
+        `/employees?page=${paginateData.current_page}`,
+      );
+      setTotalData(empRes.data.data.datas.total);
+      setPaginateData({
+        current_page: empRes.data.data.datas.current_page,
+        last_page: empRes.data.data.datas.last_page,
+      });
       const activeEmployees = empRes?.data?.data?.datas?.data || [];
       setEmployees(
         activeEmployees.filter(
@@ -167,7 +181,7 @@ export default function PayrollPage() {
     fetchPosition();
     fetchAllowance();
     fetchDeduction();
-  }, [selectedMonth, selectedYear]);
+  }, [selectedMonth, selectedYear, paginateData.current_page]);
 
   const handleOpenModal = (emp: Employee) => {
     if (!isPayrollSubmissionAllowed) {
@@ -333,13 +347,13 @@ export default function PayrollPage() {
   const totalAllowance = useMemo(() => {
     return allowance
       .filter((item) => selectedAllowances.includes(item.id))
-      .reduce((sum, item) => sum + item.amount, 0);
+      .reduce((sum, item) => sum + Number(item.amount), 0);
   }, [allowance, selectedAllowances]);
 
   const totalDeduction = useMemo(() => {
     return deduction
       .filter((item) => selectedDeductions.includes(item.id))
-      .reduce((sum, item) => sum + item.amount, 0);
+      .reduce((sum, item) => sum + Number(item.amount), 0);
   }, [deduction, selectedDeductions]);
 
   const totalAllowanceWithCustom = useMemo(() => {
@@ -455,7 +469,7 @@ export default function PayrollPage() {
             {/* Year Selector */}
             <div className="relative flex-1 sm:flex-none">
               <select
-                className="block w-full sm:w-[120px] pl-4 pr-10 min-h-[44px] appearance-none border border-slate-200 bg-background rounded-lg focus-within:outline-blue-soft/20 focus-within:outline-3 transition-all text-sm font-bold cursor-pointer"
+                className="block w-full text-blue-dark sm:w-[120px] pl-4 pr-10 min-h-[44px] appearance-none border border-slate-200 bg-background rounded-lg focus-within:outline-blue-soft/20 focus-within:outline-3 transition-all text-sm font-bold cursor-pointer"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
               >
@@ -570,14 +584,16 @@ export default function PayrollPage() {
               </table>
             )}
           </div>
-
-          {!loading && tableData.length > 0 && (
-            <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500 bg-white">
-              <span className="px-2 font-medium">
-                Menampilkan {tableData.length} karyawan aktif
-              </span>
-            </div>
-          )}
+          <div className="my-2 mx-4">
+            {tableData.length > 0 && (
+              <Paginate
+                data={tableData}
+                totalData={totalData}
+                paginateData={paginateData}
+                setPaginateData={setPaginateData}
+              />
+            )}
+          </div>
         </div>
       </div>
 
@@ -636,13 +652,16 @@ export default function PayrollPage() {
                       Rp
                     </span>
                   </div>
-                  <input
+                  <NumericFormat
                     id="base_salary"
-                    type="number"
+                    allowLeadingZeros
+                    thousandSeparator="."
+                    decimalSeparator=","
                     min="0"
-                    step="1000"
                     value={baseSalaryInput}
-                    onChange={(e) => setBaseSalaryInput(e.target.value)}
+                    onValueChange={(values) => {
+                      setBaseSalaryInput(values.value); // ini angka asli tanpa titik
+                    }}
                     placeholder="Biarkan kosong jika default"
                     className="block w-full pl-10 pr-3 min-h-[44px] border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#0062FF]/20 focus:border-[#0062FF] transition-all text-sm font-medium"
                   />

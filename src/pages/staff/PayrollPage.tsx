@@ -4,18 +4,17 @@ import {
   BanknoteX,
   CalendarClock,
   CircleDollarSign,
-  HandCoins,
-  ReceiptText,
+  Loader2,
   X,
 } from "lucide-react";
 import Layout from "../../components/layouts/DashboardLayout";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
-import { Card, CardContent, CardHeader } from "../../components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
 import { CenterModal } from "../../components/ui/Modal";
-import { toRupiah } from "../../utils/toRupiah";
 import type { Payroll } from "../../types/userType";
 import { Loading } from "../../components/ui/load";
+import type { Payslip } from "../../types/payrollType";
 
 const MONTH_OPTIONS = [
   { id: 1, label: "Januari" },
@@ -48,7 +47,9 @@ export default function StaffPayrollPage() {
   const [month, setMonth] = useState<number>(currentDate.getMonth() + 1);
   const [year, setYear] = useState<number>(currentDate.getFullYear());
   const [payroll, setPayroll] = useState<PayrollDetail | null>(null);
+  const [payslip, setPayslip] = useState<Payslip | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingPayslip, setLoadingPayslip] = useState<boolean>(false);
   const [openDetail, setOpenDetail] = useState<boolean>(false);
 
   const userName = user?.employee?.full_name || user?.name || "Staff";
@@ -62,6 +63,7 @@ export default function StaffPayrollPage() {
       const myPayroll = payrollData.find(
         (item: PayrollDetail) => Number(item.employee_id) === user.employee_id,
       );
+
       setPayroll(myPayroll || null);
     } catch (error) {
       console.error("Failed to fetch payroll data:", error);
@@ -71,18 +73,35 @@ export default function StaffPayrollPage() {
     }
   };
 
+  const fetchPayslip = async () => {
+    if (!user?.employee_id) return;
+    try {
+      setLoadingPayslip(true);
+      const response = await api.post("/payslip-by-payroll-id", {
+        payroll_id: payroll?.id,
+      });
+
+      setPayslip(response?.data.data.datas);
+    } catch (error) {
+      console.error("Failed to fetch payslip data:", error);
+    } finally {
+      setLoadingPayslip(false);
+    }
+  };
+
   useEffect(() => {
     fetchPayroll();
   }, [month, year, user?.employee_id]);
+
+  useEffect(() => {
+    fetchPayslip();
+  }, [payroll?.id]);
 
   const isPaid = useMemo(() => !!payroll, [payroll]);
   const grossSalary =
     Number(payroll?.base_salary || 0) +
     Number(payroll?.allowance || 0) +
     Number(payroll?.overtime_pay || 0);
-  const netSalary = Number(
-    payroll?.total_salary || grossSalary - Number(payroll?.deduction || 0),
-  );
 
   return (
     <Layout>
@@ -160,7 +179,11 @@ export default function StaffPayrollPage() {
                       onClick={() => setOpenDetail(true)}
                       className="min-h-[44px] px-5 rounded-lg bg-blue-dark text-white text-sm font-semibold cursor-pointer hover:bg-blue-dark/90 transition"
                     >
-                      Lihat Rincian Gaji
+                      {loadingPayslip ? (
+                        <Loader2 className="animate-spin" size={16} />
+                      ) : (
+                        "Lihat Rincian Gaji"
+                      )}
                     </button>
                   ) : (
                     <div className="rounded-lg bg-orange-50 text-orange-700 px-4 py-2 text-sm font-medium border border-orange-200">
@@ -187,64 +210,19 @@ export default function StaffPayrollPage() {
               Periode {MONTH_OPTIONS[month - 1].label} {year}
             </p>
           </div>
+          <div className="relative mt-5 h-[600px] w-full overflow-hidden">
+            <iframe
+              src={`http://localhost:8000/payslip/${payslip?.file_path}#toolbar=0`}
+              className="w-full h-full rounded-lg pointer-events-none overflow-hidden"
+            />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-5">
-            <Card className="border border-border shadow-none">
-              <CardHeader className="pb-2">
-                <p className="text-xs uppercase tracking-wider text-dark/60 font-semibold">
-                  Pendapatan
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex items-center justify-between text-blue-dark">
-                  <span>Gaji Pokok</span>
-                  <span className="font-semibold">
-                    {toRupiah(Number(payroll?.base_salary || 0))}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-blue-dark">
-                  <span>Tunjangan</span>
-                  <span className="font-semibold">
-                    {toRupiah(Number(payroll?.allowance || 0))}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-blue-dark">
-                  <span>Lembur</span>
-                  <span className="font-semibold">
-                    {toRupiah(Number(payroll?.overtime_pay || 0))}
-                  </span>
-                </div>
-                <div className="pt-2 mt-2 border-t border-border flex justify-between font-bold text-blue-dark">
-                  <span>Total Pendapatan</span>
-                  <span>{toRupiah(grossSalary)}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-border shadow-none">
-              <CardHeader className="pb-2">
-                <p className="text-xs uppercase tracking-wider text-dark/60 font-semibold">
-                  Potongan & Take Home Pay
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex items-center justify-between text-blue-dark">
-                  <span>Potongan</span>
-                  <span className="font-semibold">
-                    {toRupiah(Number(payroll?.deduction || 0))}
-                  </span>
-                </div>
-                <div className="pt-2 mt-2 border-t border-border flex justify-between text-blue-dark font-bold">
-                  <span>Gaji Diterima</span>
-                  <span>{toRupiah(netSalary)}</span>
-                </div>
-                <p className="text-xs text-dark/60 pt-1">
-                  Nominal mengikuti data payroll yang diproses admin.
-                </p>
-              </CardContent>
-            </Card>
+            <a
+              href={`http://localhost:8000/payslip/${payslip?.file_path}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute inset-0"
+            />
           </div>
-
           <div className="pt-5 border-t border-border/70 mt-5 flex justify-end">
             <button
               type="button"

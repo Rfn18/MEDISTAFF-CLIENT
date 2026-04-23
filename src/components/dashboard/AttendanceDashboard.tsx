@@ -18,6 +18,7 @@ import type { Attendance, StatusFilter } from "../../types/attendanceType";
 import type { Department, Employee } from "../../types/userType";
 import formatTime from "../../utils/formatTime";
 import { TableSkeleton } from "../ui/skeletonLoad";
+import { Paginate } from "../ui/paginate";
 
 export default function AttendanceDashboard() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -26,6 +27,11 @@ export default function AttendanceDashboard() {
   const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [paginateData, setPaginateData] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
+  const [totalData, setTotalData] = useState(0);
   const [loading, setLoading] = useState(true);
 
   // Filter states
@@ -37,8 +43,9 @@ export default function AttendanceDashboard() {
   const fetchAttendanceToday = async () => {
     try {
       setLoading(true);
-      const res = await api.get("/attendances/today");
-
+      const res = await api.get(
+        `/attendance-today?page=${paginateData.current_page}`,
+      );
       setAttendances(res.data.data?.datas?.data ?? res.data.data ?? []);
     } catch (error) {
       console.error("Failed fetching attendance data", error);
@@ -473,18 +480,13 @@ export default function AttendanceDashboard() {
 
         {/* Table footer */}
         {filteredAttendances.length > 0 && (
-          <div className="flex items-center justify-between px-6 py-3 bg-background/40 border-t border-border/50">
-            <p className="text-xs text-blue-dark/40">
-              Menampilkan {filteredAttendances.length} dari {attendances.length}{" "}
-              data kehadiran
-            </p>
-            <p className="text-xs text-blue-dark/40">
-              Terakhir diperbarui:{" "}
-              {new Date().toLocaleTimeString("id-ID", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
+          <div className="mx-4 my-2">
+            <Paginate
+              data={attendances}
+              totalData={totalData}
+              paginateData={paginateData}
+              setPaginateData={setPaginateData}
+            />
           </div>
         )}
       </div>

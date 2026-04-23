@@ -4,7 +4,7 @@ import { Loading } from "./load";
 type Column<T> = {
   header: string;
   accessor?: keyof T;
-  render?: (row: T) => React.ReactNode;
+  render?: (row: T, index: number) => React.ReactNode;
   className?: string;
 };
 
@@ -45,7 +45,7 @@ export default function DataTable<T>({ columns, data }: DataTableProps<T>) {
               {columns.map((col, colIndex) => (
                 <td key={colIndex} className="px-6 py-4">
                   {col.render
-                    ? col.render(row)
+                    ? col.render(row, rowIndex)
                     : col.accessor
                       ? String((row as any)[col.accessor])
                       : "-"}

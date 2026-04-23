@@ -13,6 +13,12 @@ export type Payroll = {
   absent_pay: number;
 };
 
+export type Payslip = {
+  employee_id: number;
+  payroll_id: number;
+  file_path: string;
+}
+
 export type PayrollPreview = {
   late_pay: number;
   absent_pay: number;

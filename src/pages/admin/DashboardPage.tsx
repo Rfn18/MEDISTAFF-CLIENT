@@ -18,6 +18,7 @@ import api from "../../services/api";
 import AttendanceDashboard from "../../components/dashboard/AttendanceDashboard";
 import { EmployeeTableDashboard } from "../../components/dashboard/dashboardTable";
 import { CardSkeleton, TableSkeleton } from "../../components/ui/skeletonLoad";
+import { Paginate } from "../../components/ui/paginate";
 
 const Dashboard = () => {
   const [employee, setEmployee] = useState<Employee[]>([]);
@@ -25,6 +26,11 @@ const Dashboard = () => {
   const [employeeByCategory, setEmployeeByCategory] = useState<
     EmployeeByCategories[]
   >([]);
+  const [paginateData, setPaginateData] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
+  const [totalData, setTotalData] = useState(0);
   const [department, setDepartment] = useState<Department[]>([]);
   const [shift, setShift] = useState([]);
   const [leaveRequest, setLeaveRequest] = useState<LeaveRequest[]>([]);
@@ -35,10 +41,17 @@ const Dashboard = () => {
     try {
       // employee
       setLoading(true);
-      const responseEmployee = await api.get(`/employees`);
+      const responseEmployee = await api.get(
+        `/employees?page=${paginateData.current_page}`,
+      );
       const dataEmployee = responseEmployee.data.data.datas.data;
       setEmployee(dataEmployee);
       setEmployeeCount(responseEmployee.data.data.datas.total);
+      setTotalData(responseEmployee.data.data.datas.total);
+      setPaginateData({
+        current_page: responseEmployee.data.data.datas.current_page,
+        last_page: responseEmployee.data.data.datas.last_page,
+      });
 
       const medicalEmployee = await api.get("/employee/medical-staff");
       const nonMedicalEmployee = await api.get("/employee/non-medical-staff");
@@ -81,7 +94,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [paginateData.current_page]);
 
   const countLeaveRequestPending = () => {
     return leaveRequest.filter((item) => item.status === "pending").length;
@@ -176,6 +189,16 @@ const Dashboard = () => {
             )}
           </CardContent>
         </Card>
+        {employee.length > 0 && (
+          <div className="mx-4 my-2">
+            <Paginate
+              data={employee}
+              totalData={totalData}
+              paginateData={paginateData}
+              setPaginateData={setPaginateData}
+            />
+          </div>
+        )}
       </div>
     </Layout>
   );

@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 type Column<T> = {
   header: string;
   accessor?: keyof T;
-  render?: (row: T) => React.ReactNode;
+  render?: (row: T, index: number) => React.ReactNode;
   onEdit?: (row: T) => void;
   onActivate?: (row: T) => void;
 };
@@ -77,9 +77,9 @@ export function AttendanceTable({ data }: { data: Attendance[] }) {
   };
   const columns: Column<Attendance>[] = [
     {
-      header: "ID",
+      header: "No",
       render: (row: Attendance) => row.id,
-    },
+    },  
     {
       header: "Karyawan",
       render: (row: Attendance) => {
@@ -184,7 +184,7 @@ export function AttendanceTableUser({ data }: { data: Attendance[] }) {
   const columns: Column<Attendance>[] = [
     {
       header: "No",
-      accessor: "id",
+      render: (row: Attendance, index: number) => index + 1,
     },
     {
       header: "Hari",

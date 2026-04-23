@@ -6,25 +6,48 @@ import SideModal from "../../../components/ui/Modal";
 import type { Position } from "../../../types/userType";
 import PositionForm from "../../../components/form/admin/PositionForm";
 import api from "../../../services/api";
+import { Paginate } from "../../../components/ui/paginate";
+import { Loading } from "../../../components/ui/load";
 
 export default function Position() {
   const [open, setOpen] = useState(false);
   const [positionData, setPositionData] = useState<Position[]>([]);
   const [positionForm, setPositionForm] = useState<Position | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [paginateData, setPaginateData] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
+  const [totalData, setTotalData] = useState(0);
 
   const fetchPosition = async () => {
     try {
-      const response = await api.get(`/positions`);
+      setLoading(true);
+      const response = await api.get(
+        `/positions?page=${paginateData.current_page}`,
+      );
       const data = response.data.data.datas.data;
       setPositionData(data);
+      setTotalData(response.data.data.datas.total);
+      setPaginateData({
+        current_page: response.data.data.datas.current_page,
+        last_page: response.data.data.datas.last_page,
+      });
+      setTotalData(response.data.data.datas.total);
+      setPaginateData({
+        current_page: response.data.data.datas.current_page,
+        last_page: response.data.data.datas.last_page,
+      });
     } catch (error) {
       console.error("fething data error", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchPosition();
-  }, []);
+  }, [paginateData.current_page]);
 
   const handleAddPosition = async (data: Position) => {
     setPositionForm(data);
@@ -95,12 +118,22 @@ export default function Position() {
           </div>
         </CardHeader>
         <div>
-          <PositionTable
-            data={positionData}
-            onEdit={(row) => openEditPosition(row)}
-            onDelete={(row) => handleDeletePosition(row)}
-          />
+          {loading ? (
+            <Loading message="loading data..." />
+          ) : (
+            <PositionTable
+              data={positionData}
+              onEdit={(row) => openEditPosition(row)}
+              onDelete={(row) => handleDeletePosition(row)}
+            />
+          )}
         </div>
+        <Paginate
+          data={positionData}
+          totalData={totalData}
+          paginateData={paginateData}
+          setPaginateData={setPaginateData}
+        />
       </Card>
 
       <SideModal
