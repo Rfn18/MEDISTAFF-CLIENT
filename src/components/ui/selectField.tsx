@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 type OptionType = {
-  id: number | string ;
+  id: number | string;
   label: string;
 };
 

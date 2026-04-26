@@ -17,6 +17,8 @@ export default function UserPage() {
   const [userData, setUserData] = useState<User[]>([]);
   const [userForm, setUserForm] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const [paginateLoading, setPaginateLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [paginateData, setPaginateData] = useState({
     current_page: 1,
     last_page: 1,
@@ -26,6 +28,7 @@ export default function UserPage() {
   const fetchUser = async () => {
     try {
       setLoading(true);
+      setPaginateLoading(true);
       const response = await api.get(
         `/users?page=${paginateData.current_page}`,
       );
@@ -40,6 +43,7 @@ export default function UserPage() {
       console.error("fething data error", error);
     } finally {
       setLoading(false);
+      setPaginateLoading(false);
     }
   };
 
@@ -58,19 +62,16 @@ export default function UserPage() {
     } catch (error) {
       console.error("fething data error", error);
     } finally {
+      setUserForm(null);
       setLoading(false);
       setOpen(false);
     }
   };
 
   const handleInactivateUser = async (row: User) => {
-    const newStatus = row.is_active === 1 ? 0 : 1;
     try {
       setLoading(true);
-      const response = await api.post(`/users/${row.id}/status`, {
-        is_active: newStatus,
-        _method: "PUT",
-      });
+      await api.delete(`/users/${row.id}`);
       fetchUser();
     } catch (error) {
       console.error("fething data error", error);
@@ -151,6 +152,7 @@ export default function UserPage() {
           totalData={totalData}
           paginateData={paginateData}
           setPaginateData={setPaginateData}
+          paginateLoading={paginateLoading}
         />
       </Card>
 

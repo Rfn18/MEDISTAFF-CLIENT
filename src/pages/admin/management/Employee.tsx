@@ -22,12 +22,13 @@ export default function Employee() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [searchValue, setSearchValue] = useState("");
 
   const fetchEmployee = async () => {
     try {
       setLoading(true);
       const response = await api.get(
-        `/employees?page=${paginateData.current_page}`,
+        `/employees/search?page=${paginateData.current_page}&search=${searchValue}`,
       );
       const data = response.data.data.datas.data;
       setEmployeeData(data);
@@ -45,8 +46,11 @@ export default function Employee() {
   };
 
   useEffect(() => {
-    fetchEmployee();
-  }, [paginateData.current_page]);
+    const timer = setTimeout(() => {
+      fetchEmployee();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [paginateData.current_page, searchValue]);
 
   const handleAddEmployee = async (data: EmployeeType) => {
     setEmployeeForm(data);
@@ -73,11 +77,10 @@ export default function Employee() {
   const handleInactivateEmployee = async (row: EmployeeType) => {
     const newStatus = row.employee_status === "active" ? "inactive" : "active";
     try {
-      const response = await api.post(`/employees/${row.id}/status`, {
+      await api.post(`/employees/${row.id}/status`, {
         employee_status: newStatus,
         _method: "PUT",
       });
-      console.log(response);
       fetchEmployee();
     } catch (error) {
       console.error("fething data error", error);
@@ -110,6 +113,11 @@ export default function Employee() {
       fetchEmployee();
       setEmployeeForm(null);
     }
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+    setPaginateData((prev) => ({ ...prev, current_page: 1 }));
   };
 
   return (
@@ -148,6 +156,8 @@ export default function Employee() {
               <div className="flex w-50 border-border border rounded-md px-4 py-2">
                 <Search size={18} />
                 <input
+                  value={searchValue}
+                  onChange={handleSearch}
                   type="text"
                   placeholder="Cari karyawan..."
                   className="w-full h-full focus:outline-none ml-2 text-sm"
@@ -201,18 +211,6 @@ export default function Employee() {
           defaultValue={employeeForm ? [employeeForm] : []}
         />
       </SideModal>
-
-      <SelectListModal
-        data={[
-          { id: "1", name: "John Doe" },
-          { id: "2", name: "Jane Smith" },
-          { id: "3", name: "Alice Johnson" },
-          ]}
-        title="Select Employee"
-        onSelect={(item) => console.log(item)}
-        open={true}
-        onClose={() => console.log("close")}
-      />
     </>
   );
 }
